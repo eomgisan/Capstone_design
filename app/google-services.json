@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "467108144008",
+    "project_id": "learndry-bin",
+    "storage_bucket": "learndry-bin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467108144008:android:5a32a90c9a490858b2503d",
+        "android_client_info": {
+          "package_name": "com.example.ex1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "467108144008-4n3g6ug2k60l6uv9ifb843ak54tp9tem.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH3M_HXDTOGLdYYr1R6RpJpLvLG9BQnls"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "467108144008-4n3g6ug2k60l6uv9ifb843ak54tp9tem.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
