@@ -47,7 +47,8 @@ public class SignUpActivity  extends AppCompatActivity {
                     signUp();
                     break;
                 case R.id.goToLogin:
-                    goToLoginActivty();
+                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                    startActivity(intent);
                     break;
             }
         }
@@ -94,8 +95,5 @@ public class SignUpActivity  extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void goToLoginActivty(){
-        Intent intent=new Intent(this,LoginActivity.class);
-        startActivity(intent);
-    }
+
 }
