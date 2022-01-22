@@ -103,6 +103,8 @@ public class LoginActivity extends AppCompatActivity {
             startToast("이메일 또는 비밀번호를 입력해주세요.");
         }
     }
+
+
     long pressedTime = 0; //'뒤로가기' 버튼 클릭했을 때의 시간
     @Override
     public void onBackPressed() {

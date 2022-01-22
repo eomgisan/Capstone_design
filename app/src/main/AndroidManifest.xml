@@ -30,6 +30,10 @@
         <activity
             android:name=".PassWordResetActivity">
         </activity>
+
+        <activity
+            android:name=".UserInfoActivity">
+        </activity>
     </application>
 
 </manifest>

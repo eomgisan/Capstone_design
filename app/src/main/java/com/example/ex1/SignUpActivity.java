@@ -58,7 +58,7 @@ public class SignUpActivity  extends AppCompatActivity {
 
         String email = ((EditText)findViewById(R.id.loginEmail)).getText().toString();
         String password = ((EditText)findViewById(R.id.loginPassword)).getText().toString();
-        String passwordCheck = ((EditText)findViewById(R.id.setPassword2)).getText().toString();
+        String passwordCheck = ((EditText)findViewById(R.id.loginPassword2)).getText().toString();
 
         if(email.length()>0 && password.length() > 0 && password.length() >0){
 
