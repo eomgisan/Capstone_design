@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
         if(user == null){
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }else{
+            Log.e("메인에서 엑티비티 시작","카메라 엑티비티 시작");
+            startActivity(new Intent(MainActivity.this,CameraActivity.class));
             // 로그인 되어있으면 회원정보가 데이터베이스에 있는지 확인한다.
 
             // 데이터베이스 초기화
