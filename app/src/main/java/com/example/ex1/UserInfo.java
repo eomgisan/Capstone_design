@@ -8,12 +8,13 @@ public class UserInfo {
     private String address;
     private String birth;
 
+    // 추가적으로 빨래통 1, 빨래통 2, 세제 정보, 지역정보 선언해주기
+
     public UserInfo(String name, String phoneNum, String address, String birth){
         this.name = name;
         this.address = address;
         this.phoneNum = phoneNum;
         this.birth = birth;
-
     }
 
     public String getName(){

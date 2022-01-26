@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.ktx.Firebase;
 
-
+// 비밀번호 재설정 엑티비티
 public class PassWordResetActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 

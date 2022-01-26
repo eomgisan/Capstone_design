@@ -15,6 +15,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+// 회원가입 엑티비티
 public class SignUpActivity  extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private static final String TAG = "SignUpActivity";
@@ -44,6 +45,7 @@ public class SignUpActivity  extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.signUpButton:
+                    // 회원가입 버튼 클릭시 signUp 함수 동작
                     signUp();
                     break;
                 case R.id.goToLogin:

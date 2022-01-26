@@ -24,28 +24,40 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        findViewById(R.id.logoutButton).setOnClickListener(onClickListener);
+
+
+        // xml 설정
         setContentView(R.layout.activity_main);
+
+        // 현재 사용자 누군지 확인
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         // 현재 로그인 여부를 확인해서 로그인 안되어있으면 로그인 화면으로 가는 코드
         if(user == null){
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }else{
-            Log.e("메인에서 엑티비티 시작","카메라 엑티비티 시작");
-            startActivity(new Intent(MainActivity.this,CameraActivity.class));
-            // 로그인 되어있으면 회원정보가 데이터베이스에 있는지 확인한다.
-
-            // 데이터베이스 초기화
+            // 데이터베이스 초기화 <- Firebase Firestore db에서 회원 정보를 가져올 예정
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+            // 회원정보 입력 페이지로 이동 ( 임시 )
+            startActivity(new Intent(MainActivity.this, UserInfoActivity.class));
 
+            // 데이터베이스 users 콜렉션 안에서 사용자 회원별 uid document로 접속
             DocumentReference docRef = db.collection("users").document(user.getUid());
+
+            // document에서 불러오는 위 쿠드가 수행 완료시 동작
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
+                // DocumentSnapshot 자료형인 task에 결과를 저장
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if(document != null) {
 
+                        // 정상적으로 동작 했을 경우 document로 복사
+                        DocumentSnapshot document = task.getResult();
+
+                        if(document != null) {
+                            // document가 비어있을경우 확인
                             if (document.exists()) {
                                 // 데이터베이스에서 회원정보 가져오기 document에 저장됨
                                 Log.d(TAG, "DocumentSnapshot data: " + document.getData());
@@ -60,18 +72,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
-
         }
-
-        findViewById(R.id.logoutButton).setOnClickListener(onClickListener);
-
     }
 
+    // 버튼 클릭시 뭐를 동작 시킬지 구분해주는 부분
     View.OnClickListener onClickListener = new View.OnClickListener(){
         @Override
         public void onClick(View v){
             switch (v.getId()){
                 case R.id.logoutButton:
+                    // 로그아웃 버튼 클릭시 로그아웃 후 로그인 엑티비티로 이동
                     FirebaseAuth.getInstance().signOut();
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                     break;

@@ -15,6 +15,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+// 로그인 엑티비티
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 

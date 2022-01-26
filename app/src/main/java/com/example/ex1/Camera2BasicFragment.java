@@ -263,6 +263,7 @@ public class Camera2BasicFragment extends Fragment
      * This a callback object for the {@link ImageReader}. "onImageAvailable" will be called when a
      * still image is ready to be saved.
      */
+
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener
             = new ImageReader.OnImageAvailableListener() {
 
@@ -272,6 +273,7 @@ public class Camera2BasicFragment extends Fragment
         }
 
     };
+
 
     /**
      * {@link CaptureRequest.Builder} for the camera preview
@@ -951,6 +953,7 @@ public class Camera2BasicFragment extends Fragment
         }
     }
 
+    // 이미지 특정 링크에 저장하는 함수
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
@@ -972,15 +975,19 @@ public class Camera2BasicFragment extends Fragment
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
 
+
+            // 파이어 스토리지에 저장하기위해 스토리지 선언
             FirebaseStorage storage = FirebaseStorage.getInstance();
             // Create a storage reference from our app
             StorageReference storageRef = storage.getReference();
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            StorageReference mountainImagesRef = storageRef.child("images/"+user.getUid()+"/profileImage");
+            StorageReference imagesRef = storageRef.child("images/"+user.getUid()+"/profileImage");
 
-            UploadTask uploadTask = mountainImagesRef.putBytes(bytes);
+            UploadTask uploadTask = imagesRef.putBytes(bytes);
             // 저장된 url 가져오기 왜냐면 회원정보에 이 사진을 넣어줘야하잖아.
+
+
             uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
@@ -989,7 +996,7 @@ public class Camera2BasicFragment extends Fragment
                     }
 
                     // Continue with the task to get the download URL
-                    return mountainImagesRef.getDownloadUrl();
+                    return imagesRef.getDownloadUrl();
                 }
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override
@@ -1010,7 +1017,7 @@ public class Camera2BasicFragment extends Fragment
                     }
 
                     // Continue with the task to get the download URL
-                    return mountainImagesRef.getDownloadUrl();
+                    return imagesRef.getDownloadUrl();
                 }
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override

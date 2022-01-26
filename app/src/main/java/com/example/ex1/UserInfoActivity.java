@@ -1,13 +1,23 @@
 package com.example.ex1;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -15,10 +25,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class UserInfoActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    // 데이터베이스 초기화
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +47,70 @@ public class UserInfoActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         findViewById(R.id.init_info_button).setOnClickListener(onClickListener);
+        ImageView profileImage = (ImageView)findViewById(R.id.profileImage);
+        profileImage.setOnClickListener(onClickListener);
+
+
+
+        // 여기서 회원정보에 있는거 다 먼저 불러오기
+        DocumentReference docRef = db.collection("cities").document("SF");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d("TAG", "DocumentSnapshot data: " + document.getData());
+                        // 회원정보등록xml 파일에 있는 텍스트를 가져옴
+                        UserInfo userInfo = (UserInfo)document.getData();
+
+                        EditText name = (EditText)findViewById(R.id.infoName);
+                        EditText phoneNum = (EditText)findViewById(R.id.infoPhoneNum);
+                        EditText address = (EditText)findViewById(R.id.infoAddress);
+                        EditText birth = (EditText)findViewById(R.id.infoBirth);
+                        ImageView profileImage = (ImageView)findViewById(R.id.profileImage);
+
+
+                        name.setText(userInfo.getName());
+                        phoneNum.setText(userInfo.getPhoneNum());
+                        address.setText(userInfo.getAddress());
+                        birth.setText(userInfo.getBirth());
+
+                        // 파이어 스토리지에서 사진 가져오기 위해 선언
+                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                        // Create a storage reference from our app
+                        StorageReference storageRef = storage.getReference();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                        StorageReference imagesRef = storageRef.child("images/"+user.getUid()+"/profileImage");
+
+                        if(imagesRef == null){
+                            Log.d("TAG","프로필 사진 등록 요망");
+                        }else{
+                            imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    Glide.with(UserInfoActivity.this).load(uri).into(profileImage);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d("TAG","프로필 사진 불러오기 오류");
+                                }
+                            });
+                        }
+
+
+                    } else {
+                        Log.d("TAG", "No such document");
+                    }
+                } else {
+                    Log.d("TAG", "get failed with ", task.getException());
+                }
+            }
+        });
+
+
 
     }
 
@@ -37,6 +120,10 @@ public class UserInfoActivity extends AppCompatActivity {
             switch (v.getId()){
                 case R.id.init_info_button:
                     init();
+                    break;
+                case R.id.profileImage:
+                    startToast("프로필 사진 촬영");
+                    startActivity(new Intent(UserInfoActivity.this, CameraActivity.class));
                     break;
             }
         }
@@ -50,15 +137,11 @@ public class UserInfoActivity extends AppCompatActivity {
         String address = ((EditText)findViewById(R.id.infoAddress)).getText().toString();
         String birth = ((EditText)findViewById(R.id.infoBirth)).getText().toString();
 
+
         // 입력란 빈공간 확인
         if(phoneNum.length()>0 && name.length() >0 && address.length() >0 && birth.length() >0 ){
 
-            // 데이터베이스 초기화
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-
             UserInfo userInfo = new UserInfo(name,phoneNum,address,birth);
-
             if (user!=null) {
 
                 db.collection("users").document(user.getUid()).set(userInfo)
@@ -106,6 +189,17 @@ public class UserInfoActivity extends AppCompatActivity {
         }
     }
 
+    private void DownloadImg(int num){
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+        StorageReference pathReference = storageRef.child("images/"+user.getUid()+"/profileImage");
+        pathReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+
+            }
+        });
+    }
     // 토스트 창을 띄우기 위한 함수
     private void startToast( String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
