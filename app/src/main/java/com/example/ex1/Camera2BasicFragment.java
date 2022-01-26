@@ -22,6 +22,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
@@ -58,6 +59,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
@@ -68,6 +70,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -931,6 +934,7 @@ public class Camera2BasicFragment extends Fragment
         switch (view.getId()) {
             case R.id.picture: {
                 takePicture();
+                showToast("잠시 후 회원정보 화면으로 이동합니다.");
                 break;
             }
             case R.id.change: {
@@ -957,7 +961,7 @@ public class Camera2BasicFragment extends Fragment
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
-    private static class ImageUpLoader implements Runnable {
+    private class ImageUpLoader implements Runnable {
 
         /**
          * The JPEG image
@@ -974,7 +978,6 @@ public class Camera2BasicFragment extends Fragment
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
-
 
             // 파이어 스토리지에 저장하기위해 스토리지 선언
             FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -1025,6 +1028,10 @@ public class Camera2BasicFragment extends Fragment
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         Log.e("카메라 동작 성공", "카메라 동작 성공"+downloadUri);
+
+                        Activity activity = getActivity();
+                        Intent intent = new Intent(activity, UserInfoActivity.class);
+                        startActivity(intent);
                     } else {
                         // Handle failures
                         // ...
@@ -1032,10 +1039,9 @@ public class Camera2BasicFragment extends Fragment
                     }
                 }
             });
-
         }
-
     }
+
 
     /**
      * Compares two {@code Size}s based on their areas.

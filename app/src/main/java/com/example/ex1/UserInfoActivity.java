@@ -1,6 +1,5 @@
 package com.example.ex1;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,12 +9,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,7 +19,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,7 +31,10 @@ public class UserInfoActivity extends AppCompatActivity {
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-
+    // 파이어 스토리지에서 사진 가져오기 위해 선언
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    // Create a storage reference from our app
+    StorageReference storageRef = storage.getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,16 +50,14 @@ public class UserInfoActivity extends AppCompatActivity {
 
 
         // 여기서 회원정보에 있는거 다 먼저 불러오기
-        DocumentReference docRef = db.collection("cities").document("SF");
+        DocumentReference docRef = db.collection("users").document(user.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
+
                     if (document.exists()) {
-                        Log.d("TAG", "DocumentSnapshot data: " + document.getData());
-                        // 회원정보등록xml 파일에 있는 텍스트를 가져옴
-                        UserInfo userInfo = (UserInfo)document.getData();
 
                         EditText name = (EditText)findViewById(R.id.infoName);
                         EditText phoneNum = (EditText)findViewById(R.id.infoPhoneNum);
@@ -71,16 +66,10 @@ public class UserInfoActivity extends AppCompatActivity {
                         ImageView profileImage = (ImageView)findViewById(R.id.profileImage);
 
 
-                        name.setText(userInfo.getName());
-                        phoneNum.setText(userInfo.getPhoneNum());
-                        address.setText(userInfo.getAddress());
-                        birth.setText(userInfo.getBirth());
-
-                        // 파이어 스토리지에서 사진 가져오기 위해 선언
-                        FirebaseStorage storage = FirebaseStorage.getInstance();
-                        // Create a storage reference from our app
-                        StorageReference storageRef = storage.getReference();
-                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        name.setText(document.getData().get("name").toString());
+                        phoneNum.setText(document.getData().get("phoneNum").toString());
+                        address.setText(document.getData().get("address").toString());
+                        birth.setText(document.getData().get("birth").toString());
 
                         StorageReference imagesRef = storageRef.child("images/"+user.getUid()+"/profileImage");
 
@@ -122,9 +111,9 @@ public class UserInfoActivity extends AppCompatActivity {
                     init();
                     break;
                 case R.id.profileImage:
+                    ImageView profileImage = (ImageView)findViewById(R.id.profileImage);
                     startToast("프로필 사진 촬영");
                     startActivity(new Intent(UserInfoActivity.this, CameraActivity.class));
-                    break;
             }
         }
     };

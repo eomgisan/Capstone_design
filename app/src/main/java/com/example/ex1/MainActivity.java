@@ -24,11 +24,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        findViewById(R.id.logoutButton).setOnClickListener(onClickListener);
-
 
         // xml 설정
         setContentView(R.layout.activity_main);
+        findViewById(R.id.logoutButton).setOnClickListener(onClickListener);
+
 
         // 현재 사용자 누군지 확인
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -40,8 +40,6 @@ public class MainActivity extends AppCompatActivity {
             // 데이터베이스 초기화 <- Firebase Firestore db에서 회원 정보를 가져올 예정
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            // 회원정보 입력 페이지로 이동 ( 임시 )
-            startActivity(new Intent(MainActivity.this, UserInfoActivity.class));
 
             // 데이터베이스 users 콜렉션 안에서 사용자 회원별 uid document로 접속
             DocumentReference docRef = db.collection("users").document(user.getUid());

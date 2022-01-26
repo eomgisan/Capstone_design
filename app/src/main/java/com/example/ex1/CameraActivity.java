@@ -28,11 +28,13 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.e("레이아웃 적용","레이아웃 적용");
         setContentView(R.layout.activity_camera);
-        Log.e("레이아웃 적용 완료","레이아웃 적용 완료");
+
         if (null == savedInstanceState) {
+
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, Camera2BasicFragment.newInstance())
                     .commit();
+
         }
     }
 
