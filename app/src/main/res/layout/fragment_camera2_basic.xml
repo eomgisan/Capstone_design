@@ -35,7 +35,7 @@
         <Button
             android:id="@+id/picture"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:text="picture" />
@@ -48,5 +48,11 @@
             android:layout_weight="1"
             android:text="change" />
     </LinearLayout>
+
+    <include
+        layout="@layout/view_loader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 </RelativeLayout>

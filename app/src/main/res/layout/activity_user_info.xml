@@ -1,42 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/user_info_text"
-        android:layout_width="198dp"
-        android:layout_height="71dp"
-        android:gravity="center"
-        android:text="회원정보"
-        android:textColor="#673AB7"
-        android:textSize="34sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.541" />
+    <include
+        layout="@layout/view_loader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="372dp"
-        android:layout_height="545dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginBottom="44dp"
         android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.542"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/user_info_text"
+            android:layout_width="198dp"
+            android:layout_height="71dp"
+            android:gravity="center"
+            android:text="회원정보"
+            android:textColor="#673AB7"
+            android:textSize="34sp"
+            android:textStyle="bold" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="206dp"
             android:layout_height="197dp"
-            app:cardCornerRadius="100dp" >
+            app:cardCornerRadius="100dp">
 
             <ImageView
                 android:id="@+id/profileImage"
@@ -93,4 +91,4 @@
             android:text="확인" />
 
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>
