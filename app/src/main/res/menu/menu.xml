@@ -1,23 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- "Mark Favorite", should appear as action button if possible -->
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/ic_launcher_background"
-        android:title="환경설정"
-        app:showAsAction="ifRoom" />
-
-    <!-- Settings, should always be in the overflow -->
-    <item
-        android:id="@+id/action_settings2"
-        android:title="항목1"
-        app:showAsAction="never" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/action_settings3"
-        android:title="항목2"
-        app:showAsAction="never" />
+        android:id="@+id/menu_setting"
+        android:icon="@drawable/settings"
+        android:enabled="true"
+        android:title="환경설정" />
+
+    <item
+        android:id="@+id/menu_recommand"
+        android:icon="@drawable/recommand"
+        android:enabled="true"
+        android:title="날짜추천" />
+
+    <item
+        android:id="@+id/menu_home"
+        android:icon="@drawable/home"
+        android:enabled="true"
+        android:title="홈" />
+
+    <item
+        android:id="@+id/menu_community"
+        android:icon="@drawable/community"
+        android:enabled="true"
+        android:title="커뮤니티" />
+
+    <item
+        android:id="@+id/menu_logout"
+        android:icon="@drawable/logout"
+        android:enabled="true"
+        android:title="로그아웃" />
 
 </menu>

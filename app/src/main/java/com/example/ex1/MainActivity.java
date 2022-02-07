@@ -2,20 +2,24 @@ package com.example.ex1;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
+
 import android.os.Bundle;
+
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -24,7 +28,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainAcitivity";
-    Toolbar mainToolbar;
+    BottomNavigationView bottomNavigationView;
+    Fragment homeFM = new HomeFragment();
+    Fragment settingFM = new SettingFragement();
+    Fragment recommandFM = new RecommandFragment();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,12 +41,98 @@ public class MainActivity extends AppCompatActivity {
 
         // xml 설정
         setContentView(R.layout.activity_main);
-        findViewById(R.id.logoutButton).setOnClickListener(onClickListener);
 
-        // 툴바 선언
-        mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
-        setSupportActionBar(mainToolbar);
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnItemSelectedListener(onItemSelectedListener);
+        bottomNavigationView.setSelectedItemId(R.id.menu_home);
 
+        startFirebase();
+
+    }
+
+    // 바텀 네이게이션바 선택관련 문자
+    NavigationBarView.OnItemSelectedListener onItemSelectedListener = new NavigationBarView.OnItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+
+            switch(item.getItemId()){
+                case R.id.menu_recommand:
+
+                    Log.d(TAG, "onNavigationItemSelected: recommand button clicked");
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_ly, recommandFM)
+                            .commitAllowingStateLoss();
+
+                    return true;
+
+                case R.id.menu_community:
+
+
+                    Log.d(TAG, "onNavigationItemSelected: community button clicked");
+                    return true;
+
+
+                case R.id.menu_home:
+
+
+                    Log.d(TAG, "onNavigationItemSelected: home button clicked");
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_ly, homeFM)
+                            .commitAllowingStateLoss();
+                    return true;
+                case R.id.menu_setting:
+
+
+                    Log.d(TAG, "onNavigationItemSelected: setting button clicked");
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_ly, settingFM)
+                            .commitAllowingStateLoss();
+                    return true;
+
+                case R.id.menu_logout:
+                    Log.d(TAG, "onNavigationItemSelected: logout button clicked");
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("확인");
+                    builder.setMessage("로그아웃 하시겠습니까?");
+                    builder.setPositiveButton("예",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    FirebaseAuth.getInstance().signOut();
+                                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                                }
+                            });
+                    builder.setNegativeButton("아니오",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                   // 바로 이전 상태로 갈수 있도록 구현해야함
+                                }
+                            });
+
+                    AlertDialog alertDialog = builder.create();
+
+                    alertDialog.show();
+
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+    };
+
+    // 버튼 클릭시 뭐를 동작 시킬지 구분해주는 부분
+    View.OnClickListener onClickListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View v){
+            switch (v.getId()){
+
+            }
+        }
+    };
+
+
+
+    public void startFirebase(){
         // 현재 사용자 누군지 확인
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -81,19 +176,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // 버튼 클릭시 뭐를 동작 시킬지 구분해주는 부분
-    View.OnClickListener onClickListener = new View.OnClickListener(){
-        @Override
-        public void onClick(View v){
-            switch (v.getId()){
-                case R.id.logoutButton:
-                    // 로그아웃 버튼 클릭시 로그아웃 후 로그인 엑티비티로 이동
-                    FirebaseAuth.getInstance().signOut();
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                    break;
-            }
-        }
-    };
+
+
 
     long pressedTime = 0; //'뒤로가기' 버튼 클릭했을 때의 시간
     @Override
@@ -118,47 +202,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
     // 토스트 창을 띄우기 위한 함수
     private void startToast( String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
 
-    //툴바 관리 함수들
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //return super.onCreateOptionsMenu(menu);
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    //추가된 소스, ToolBar에 추가된 항목의 select 이벤트를 처리하는 함수
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        //return super.onOptionsItemSelected(item);
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
-                Toast.makeText(getApplicationContext(), "환경설정 버튼 클릭됨", Toast.LENGTH_LONG).show();
-                return true;
-
-            case R.id.action_settings2:
-                // User chose the "Settings" item, show the app settings UI...
-                Toast.makeText(getApplicationContext(), "2번쨰 메뉴 클릭됨", Toast.LENGTH_LONG).show();
-                return true;
-
-            case R.id.action_settings3:
-                // User chose the "Settings" item, show the app settings UI...
-                Toast.makeText(getApplicationContext(), "3번째 메뉴 클릭됨", Toast.LENGTH_LONG).show();
-                return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                Toast.makeText(getApplicationContext(), "나머지 버튼 클릭됨", Toast.LENGTH_LONG).show();
-                return super.onOptionsItemSelected(item);
-
-        }
-    }
 }
