@@ -3,6 +3,7 @@ package com.example.ex1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 
 import android.app.AlertDialog;
@@ -12,7 +13,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import android.util.Log;
-
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -32,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
     Fragment homeFM = new HomeFragment();
     Fragment settingFM = new SettingFragement();
     Fragment recommandFM = new RecommandFragment();
+    Fragment bluetoothFM = new BluetoothFragment();
+
+
 
 
     @Override
@@ -54,15 +57,19 @@ public class MainActivity extends AppCompatActivity {
     NavigationBarView.OnItemSelectedListener onItemSelectedListener = new NavigationBarView.OnItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-
             switch(item.getItemId()){
                 case R.id.menu_recommand:
-
                     Log.d(TAG, "onNavigationItemSelected: recommand button clicked");
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_ly, recommandFM)
-                            .commitAllowingStateLoss();
 
+                    getSupportFragmentManager().popBackStack("recommand", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.main_ly, recommandFM,"recommand")
+                            .setReorderingAllowed(true)
+                            .addToBackStack("recommandFM")
+                            .commitAllowingStateLoss();
+                    Log.d(TAG,recommandFM.getTag());
                     return true;
 
                 case R.id.menu_community:
@@ -76,15 +83,31 @@ public class MainActivity extends AppCompatActivity {
 
 
                     Log.d(TAG, "onNavigationItemSelected: home button clicked");
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_ly, homeFM)
+
+
+                    getSupportFragmentManager().popBackStack("home", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_ly, homeFM,"home")
+                            .setReorderingAllowed(true)
+                            .addToBackStack("homeFM")
                             .commitAllowingStateLoss();
+                    Log.d(TAG,homeFM.getTag());
+
                     return true;
                 case R.id.menu_setting:
 
 
                     Log.d(TAG, "onNavigationItemSelected: setting button clicked");
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_ly, settingFM)
+
+                    getSupportFragmentManager().popBackStack("setting", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_ly, settingFM,"setting")
+                            .setReorderingAllowed(true)
+                            .addToBackStack("settingFM")
                             .commitAllowingStateLoss();
+                    Log.d(TAG,settingFM.getTag());
                     return true;
 
                 case R.id.menu_logout:
@@ -104,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                                   // 바로 이전 상태로 갈수 있도록 구현해야함
+                                    onBackPressed();
                                 }
                             });
 
@@ -119,6 +142,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    public String getCurrentFragment(){
+        String result = "";
+        for(Fragment fragment: getSupportFragmentManager().getFragments()){
+            if (fragment.isVisible()){
+                result = fragment.getTag();
+            }
+        }
+        return result;
+    }
+
+    public void updateBottomBar(){
+        String tag = getCurrentFragment();
+        Log.d(TAG,tag);
+
+        if(tag == "recommand"){
+            bottomNavigationView.getMenu().findItem(R.id.menu_recommand).setChecked(true);
+        }
+        else if(tag == "home" || tag == "bluetooth"){
+            bottomNavigationView.getMenu().findItem(R.id.menu_home).setChecked(true);
+        }
+        else if (tag == "setting"){
+            bottomNavigationView.getMenu().findItem(R.id.menu_setting).setChecked(true);
+        }
+        else{
+            //
+        }
+    }
 
     // 버튼 클릭시 뭐를 동작 시킬지 구분해주는 부분
     View.OnClickListener onClickListener = new View.OnClickListener(){
@@ -182,31 +233,38 @@ public class MainActivity extends AppCompatActivity {
     long pressedTime = 0; //'뒤로가기' 버튼 클릭했을 때의 시간
     @Override
     public void onBackPressed() {
+        if(getSupportFragmentManager().getBackStackEntryCount() == 0){
+            //마지막으로 누른 '뒤로가기' 버튼 클릭 시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 크면
+            if(System.currentTimeMillis() > pressedTime + 2000){
+                //현재 시간을 pressedTime 에 저장
+                pressedTime = System.currentTimeMillis();
+                Toast.makeText(getApplicationContext(),"한번 더 누르면 종료", Toast.LENGTH_SHORT).show();
+            }
 
+            //마지막 '뒤로가기' 버튼 클릭시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 작으면
+            else{
+                Toast.makeText(getApplicationContext(),"종료 완료", Toast.LENGTH_SHORT).show();
+                // 앱 종료
+                moveTaskToBack(true); // 태스크를 백그라운드로 이동
+                finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
 
-        //마지막으로 누른 '뒤로가기' 버튼 클릭 시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 크면
-        if(System.currentTimeMillis() > pressedTime + 2000){
-            //현재 시간을 pressedTime 에 저장
-            pressedTime = System.currentTimeMillis();
-            Toast.makeText(getApplicationContext(),"한번 더 누르면 종료", Toast.LENGTH_SHORT).show();
+                System.exit(0);
+            }
         }
-
-        //마지막 '뒤로가기' 버튼 클릭시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 작으면
         else{
-            Toast.makeText(getApplicationContext(),"종료 완료", Toast.LENGTH_SHORT).show();
-            // 앱 종료
-            moveTaskToBack(true); // 태스크를 백그라운드로 이동
-            finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
+            super.onBackPressed();
+            updateBottomBar();
+        };
 
-            System.exit(0);
-        }
+
     }
 
 
 
     // 토스트 창을 띄우기 위한 함수
-    private void startToast( String msg){
+    public void startToast( String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
     }
 
 
