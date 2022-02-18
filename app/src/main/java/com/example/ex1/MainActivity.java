@@ -1,20 +1,31 @@
 package com.example.ex1;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-
 import android.os.Bundle;
-
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -26,16 +37,66 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainAcitivity";
+
+    // 바텀네비게이션바
     BottomNavigationView bottomNavigationView;
+
+    // 프레그먼트
     Fragment homeFM = new HomeFragment();
     Fragment settingFM = new SettingFragement();
     Fragment recommandFM = new RecommandFragment();
-    Fragment bluetoothFM = new BluetoothFragment();
+
+    // 블루투스
+     // 블루투스 모드
+    final static int BT_REQUEST_ENABLE = 1;
+    final static int BT_MESSAGE_READ = 2;
+    final static int BT_CONNECTING_STATUS = 3;
+
+
+     // 블루투스 어댑터
+    BluetoothAdapter mBluetoothAdapter;
+    BluetoothDevice mbluetoothDevice;
+
+     // 블루투스 페어링 관련
+    Set<BluetoothDevice> pairedDevices;
+    boolean paired = false;
+
+    Set<BluetoothDevice> unpairedDevices = new HashSet<>();
+    List<String> unpairedList = new ArrayList<>();
+    ArrayAdapter<String> adapter;
+
+     // 블루투스 데이터 송수신 관련
+    BluetoothSocket bluetoothSocket;
+    OutputStream outputStream;
+    InputStream inputStream;
+    byte[] userUid;
+
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    float weight1;
+    float weight2;
+    float smell;
+    float vol1;
+    float vol2;
+    float temp;
+    float humi;
 
 
 
+
+
+    // 메임함수 시작시 선언부분
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +110,300 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(onItemSelectedListener);
         bottomNavigationView.setSelectedItemId(R.id.menu_home);
 
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothAdapter.disable();
         startFirebase();
 
     }
+
+
+
+    // 블루투스 관련 내용
+
+    // 블루투스 인텐트한거의 결과값에 따라 분기 설정
+    ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Log.d(TAG,"블루투스 허용");
+
+                        // 페어링할 것들 보기
+
+                    }
+                    else if (result.getResultCode() == Activity.RESULT_CANCELED){
+                        Log.d(TAG,"블루투스 거절");
+                        finish();
+                    }
+                }
+            });
+
+
+
+     // 블루투스 on 함수
+    protected void blueToothOn(TextView status) {
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(getApplicationContext(), "This device doesn't support bluetooth service", Toast.LENGTH_SHORT).show();
+            status.setText("블루투스 동작 불가능한 기기입니다.");
+
+
+        } else if (mBluetoothAdapter.isEnabled()) {
+            Toast.makeText(getApplicationContext(), "Already On", Toast.LENGTH_SHORT).show();
+            // 활성화가 이미 되어있는것으로 페어링 단계를 들어가야함
+            status.setText("블루투스 권한 허용");
+
+
+        } else {
+            // 활성화 요청을 위해 ACTION_REQUEST_ENABLE 인텐트 객체 생성
+            // 이는 시스템 액티비티를 화면을 띄워서 블루투스를 직접 할수 있다.
+
+            Intent intentBluetoothEnable = new Intent(mBluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityResult.launch(intentBluetoothEnable);
+
+            if(mBluetoothAdapter.isEnabled()){
+                status.setText("블루투스 권한 허용");
+            }
+            else{
+                status.setText("블루투스 권한 거절");
+            }
+            // TODO : 여기 브로드캐스트 리시버 설정해서 그에 따른 status 변경 코드 넣기
+        }
+    }
+
+     //블루투스 리스트 출력 함수
+    protected void selectDevice(){
+
+        // 페어링 된 객체 집합 불러오기
+        pairedDevices = mBluetoothAdapter.getBondedDevices();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("기존 페어링 장치 중 선택");
+
+        // 리스트 배열 만들기
+        List<String> pairedList = new ArrayList<>();
+        for(BluetoothDevice device : pairedDevices) {
+            pairedList.add(device.getName());
+        }
+        pairedList.add("취소");
+
+        final CharSequence[] devices = pairedList.toArray(new CharSequence[pairedList.size()]);
+        builder.setItems(devices, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == pairedList.size()-1) {
+                    selectUnpairedDevice();
+                } else {
+                    mBluetoothAdapter.cancelDiscovery();
+                    paired = true;
+                    connectDevice(devices[which].toString(), paired);
+                }
+            }
+        });
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+
+
+    }
+
+    protected final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if(device.getBondState() != BluetoothDevice.BOND_BONDED) {
+                    if(device.getName() != null) {
+                        add(device);
+                    }
+                }
+            }
+        }
+    };
+
+
+    protected void add(BluetoothDevice device) {
+        if(!(pairedDevices.contains(device))) {
+            if(unpairedDevices.add(device)) {
+                unpairedList.add(device.getName());
+            }
+        }
+        adapter.notifyDataSetChanged();
+        Toast.makeText(this, device.getName()+" 검색", Toast.LENGTH_SHORT).show();
+    }
+    // 이미 페어링된 블루투스 기기 검색
+    protected void selectPairedDevice() {
+        pairedDevices = mBluetoothAdapter.getBondedDevices();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this); // 다이얼로그 생성
+        builder.setTitle("기존 페어링 기기 연결");
+
+        List<String> pairedList = new ArrayList<>(); // 페어링된 기기이름 목록
+        for(BluetoothDevice device : pairedDevices) { // 페어링된 기기 집합에서
+            pairedList.add(device.getName());        // 장치 이름 전부 기기목록에 추가
+        }
+        pairedList.add("취소"); // 취소버튼 추가
+
+        final CharSequence[] devices = pairedList.toArray(new CharSequence[pairedList.size()]);
+        builder.setItems(devices, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == pairedList.size()-1) { // 맨 마지막 버튼이 취소 버튼
+                    selectUnpairedDevice(); // 페어링되지 않은 기기 검색
+                } else {
+                    mBluetoothAdapter.cancelDiscovery();
+                    paired = true;
+                    connectDevice(devices[which].toString(), true); // 선택된 인덱스에 해당하는 기기 연결
+                }
+            }
+        });
+        builder.setCancelable(false);    // 배경을 선택하면 무력화되는 것을 막기 위함
+        AlertDialog dialog = builder.create(); // 빌더로 다이얼로그 만들기
+        dialog.show();   // 다이얼로그 시작
+    }
+
+    // 페어링되지 않은 기기 검색
+    protected void selectUnpairedDevice() {
+        // 이미 검색 중이라면 검색을 종료하고, 다시 검색 시작
+        if(mBluetoothAdapter.isDiscovering()) {
+            mBluetoothAdapter.cancelDiscovery();
+        }
+        mBluetoothAdapter.startDiscovery();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this); // 다이얼로그 생성
+        builder.setTitle("페어링할 기기 탐색");
+
+        adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, unpairedList);
+
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mBluetoothAdapter.cancelDiscovery();
+                String name = adapter.getItem(which);
+                unpairedList.remove(name);
+                paired = false;
+                connectDevice(name, false);
+            }
+        });
+        AlertDialog dialog = builder.create(); // 빌더로 다이얼로그 만들기
+        dialog.show();
+    }
+
+    // 블루투스 페어링된 목록에서 디바이스 기기 가져오기
+    protected BluetoothDevice getPairedDevice(String name) {
+        BluetoothDevice selectedDevice = null;
+
+        for(BluetoothDevice device : pairedDevices) {
+            if(name.equals(device.getName())) {
+                selectedDevice = device;
+                break;
+            }
+        }
+        return selectedDevice;
+    }
+    // 페어링되지 않은 기기 목록에서 디바이스 기기 가져오기
+    protected BluetoothDevice getUnpairedDevice(String name) {
+        BluetoothDevice selectedDevice = null;
+
+        for(BluetoothDevice device : unpairedDevices) {
+            if(name.equals(device.getName())) {
+                selectedDevice = device;
+                break;
+            }
+        }
+        return selectedDevice;
+    }
+
+
+    private void connectDevice(String selectedDeviceName, boolean paired) {
+        final Handler mHandler = new Handler() {	// 핸들러 객체 생성
+            public void handleMessage(Message msg) {	// handleMessage() 메서드 재정의
+                Log.d(TAG,"핸들러 생성");
+                if(msg.what==1) {			// 받은 메시지가 1이라면
+                    try{
+                        Log.d(TAG,"인풋 아웃풋 스트림 생성");
+                        // 입출력 스트림 객체 생성
+                        outputStream = bluetoothSocket.getOutputStream();
+                        inputStream = bluetoothSocket.getInputStream();
+                    } catch(IOException e) {
+                        e.printStackTrace();
+                    }
+                } else { // 연결 오류나면
+                    Toast.makeText(getApplicationContext(), "연결 오류", Toast.LENGTH_SHORT).show();
+                    try {
+                        bluetoothSocket.close(); // 소켓 닫아주고 리소스 해제
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        // 별도 스레드 생성
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                Log.d(TAG, "스레드 생성");
+                if (paired){  // 페어링된 기기라면
+                    Log.d(TAG, "페어링 기기?");
+                mbluetoothDevice = getPairedDevice(selectedDeviceName);
+                }
+                else {    // 페어링되지 않은 기기라면
+                    Log.d(TAG, "페어링 아님?");
+                    mbluetoothDevice = getUnpairedDevice(selectedDeviceName);
+                }
+                // UUID 생성
+                UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+                try {
+                    bluetoothSocket = mbluetoothDevice.createRfcommSocketToServiceRecord(uuid); // 소켓 생성
+                    bluetoothSocket.connect(); 	  // 소켓 연결
+                    mHandler.sendEmptyMessage(1); // 핸들러에 메시지 1 보내기
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    mHandler.sendEmptyMessage(-1); // 핸들러에 메시지 -1 보내기
+                }
+            }
+        });
+        thread.start(); // 별도 스레드 시작
+    }
+
+    protected void sendData(){
+        userUid = user.getUid().getBytes();
+        Log.d(TAG,userUid.toString());
+        try{
+            outputStream.write(userUid);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            startToast("데이터 전송 오류");
+
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        try{
+            inputStream.close();
+            outputStream.close();
+            bluetoothSocket.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        unregisterReceiver(mReceiver);
+        super.onDestroy();
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     // 바텀 네이게이션바 선택관련 문자
     NavigationBarView.OnItemSelectedListener onItemSelectedListener = new NavigationBarView.OnItemSelectedListener() {
@@ -143,6 +495,16 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
+
+
+
+
+
+
+
+    // 프레그먼트 관련 함수
+
     public String getCurrentFragment(){
         String result = "";
         for(Fragment fragment: getSupportFragmentManager().getFragments()){
@@ -153,17 +515,26 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
+
+
+
+
+
+
+    // 바텀 네비게이션바 업데이트 함수
+    // TODO : 2개 이전으로 가고있어지금
+
     public void updateBottomBar(){
         String tag = getCurrentFragment();
         Log.d(TAG,tag);
 
-        if(tag == "recommand"){
+        if(tag.equals("recommand")){
             bottomNavigationView.getMenu().findItem(R.id.menu_recommand).setChecked(true);
         }
-        else if(tag == "home" || tag == "bluetooth"){
+        else if(tag.equals("home") || tag.equals("bluetooth")){
             bottomNavigationView.getMenu().findItem(R.id.menu_home).setChecked(true);
         }
-        else if (tag == "setting"){
+        else if (tag.equals("setting") ){
             bottomNavigationView.getMenu().findItem(R.id.menu_setting).setChecked(true);
         }
         else{
@@ -171,21 +542,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // 버튼 클릭시 뭐를 동작 시킬지 구분해주는 부분
-    View.OnClickListener onClickListener = new View.OnClickListener(){
-        @Override
-        public void onClick(View v){
-            switch (v.getId()){
-
-            }
-        }
-    };
 
 
+
+
+
+
+
+
+    // 파이어베이스 사용자 회원정보 가져오기 ( 인적사항 )
 
     public void startFirebase(){
         // 현재 사용자 누군지 확인
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
 
         // 현재 로그인 여부를 확인해서 로그인 안되어있으면 로그인 화면으로 가는 코드
         if(user == null){
@@ -230,6 +599,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
+
+
+    // 뒤로가기시 앱 종료 함수
+
     long pressedTime = 0; //'뒤로가기' 버튼 클릭했을 때의 시간
     @Override
     public void onBackPressed() {
@@ -258,6 +633,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
+
+
+
 
 
 

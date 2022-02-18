@@ -30,7 +30,13 @@ public class SettingFragement extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        ViewGroup rootview = (ViewGroup)inflater.inflate(R.layout.fragment_setting_fragement,container,false);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_setting_fragement, container, false);
+
+        // TODO : 리사이클러뷰로 설정 여러개 구현하기
+
+
+        return rootview;
     }
 }

@@ -2,6 +2,7 @@ package com.example.ex1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,7 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,6 +26,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import org.eazegraph.lib.charts.PieChart;
+import org.eazegraph.lib.models.PieModel;
 
 
 public class HomeFragment extends Fragment {
@@ -35,6 +41,16 @@ public class HomeFragment extends Fragment {
 
 
     MainActivity activity;
+    PieChart chart1;
+    PieChart chart2;
+    TextView weight1;
+    TextView weight2;
+    TextView temp;
+    TextView humi;
+    TextView smell;
+
+    Button refresh;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -49,16 +65,9 @@ public class HomeFragment extends Fragment {
         activity = null;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-
-// 여기에 동작부분 넣기
-        mAuth = FirebaseAuth.getInstance();
-
+    private void init(){
         // 데이터베이스 users 콜렉션 안에서 사용자 회원별 uid document로 접속
-        DocumentReference docRef = db.collection("laundrys").document(user.getUid());
+        DocumentReference docRef = db.collection("datas").document(user.getUid());
 
         // document에서 불러오는 위 쿠드가 수행 완료시 동작
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -75,6 +84,30 @@ public class HomeFragment extends Fragment {
                         if (document.exists()) {
                             // 데이터베이스에서 센서 정보 가져오기
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+
+
+                            activity.weight1 = Float.parseFloat(document.getData().get("weight1").toString());
+                            activity.weight2 = Float.parseFloat(document.getData().get("weight2").toString());
+                            activity.smell   = Float.parseFloat(document.getData().get("smell").toString());
+                            activity.temp    = Float.parseFloat(document.getData().get("temp").toString());
+                            activity.humi    = Float.parseFloat(document.getData().get("humi").toString());
+                            activity.vol1    = Float.parseFloat(document.getData().get("vol1").toString());
+                            activity.vol2    = Float.parseFloat(document.getData().get("vol2").toString());
+
+                            weight1.setText(String.valueOf(activity.weight1));
+                            weight2.setText(String.valueOf(activity.weight2));
+                            temp.setText(String.valueOf(activity.temp));
+                            humi.setText(String.valueOf(activity.humi));
+                            smell.setText(String.valueOf(activity.smell));
+
+                            chart1.addPieSlice(new PieModel("빨래통 1", activity.vol1, Color.parseColor("#CDA67F")));
+                            chart1.addPieSlice(new PieModel("남은공간 1", 100-activity.vol1, Color.parseColor("#FE6DA8")));
+                            chart2.addPieSlice(new PieModel("빨래통 2", activity.vol2, Color.parseColor("#CDA67F")));
+                            chart2.addPieSlice(new PieModel("남은공간 2", 100-activity.vol2, Color.parseColor("#FE6DA8")));
+
+                            chart1.startAnimation();
+                            chart2.startAnimation();
+
                         } else {
                             // 데이터베이스에 회원정보 없으면 블루투스 프레그먼트 전환
                             Log.d(TAG, "No such document");
@@ -95,12 +128,41 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        ViewGroup rootview = (ViewGroup)inflater.inflate(R.layout.fragment_home,container,false);
 
+        chart1 = (PieChart) rootview.findViewById(R.id.piechart1);
+        chart2 = (PieChart) rootview.findViewById(R.id.piechart2);
+        weight1 = (TextView) rootview.findViewById(R.id.weight1);
+        weight2 = (TextView) rootview.findViewById(R.id.weight2);
+        temp = (TextView) rootview.findViewById(R.id.temp);
+        humi = (TextView) rootview.findViewById(R.id.humi);
+        smell = (TextView) rootview.findViewById(R.id.smell);
+
+        refresh = (Button) rootview.findViewById(R.id.refreshBTN) ;
+
+// 여기에 동작부분 넣기
+        mAuth = FirebaseAuth.getInstance();
+
+        init();
+
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // TODO : 블루투스 통신으로 재측정 하라는 신호 보내기
+                activity.sendData();
+                init();
+            }
+        });
 
 
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return rootview;
     }
 }

@@ -30,7 +30,12 @@ public class RecommandFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        ViewGroup rootview = (ViewGroup)inflater.inflate(R.layout.fragment_recommand,container,false);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_recommand, container, false);
+
+        // TODO : 커스텀 캘린터로 날짜 확인할수 있고 현재 건조하기 좋은지 나쁜지 확인하기
+
+        return rootview;
     }
 }

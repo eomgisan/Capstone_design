@@ -6,16 +6,26 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ListView;
+import android.widget.Switch;
+import android.widget.TextView;
 
 
 public class BluetoothFragment extends Fragment {
 
 
-    Button bluetoothBT;
+    Button ButtonPair;
+    Button ButtonSearch;
+    Switch SwitchBluetooth;
+    TextView Status;
+    ListView List;
+
 
     MainActivity activity;
     @Override
@@ -37,12 +47,46 @@ public class BluetoothFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         ViewGroup rootview = (ViewGroup)inflater.inflate(R.layout.fragment_bluetooth,container,false);
-        bluetoothBT = rootview.findViewById(R.id.bluetoothButton);
-        bluetoothBT.setOnClickListener(new View.OnClickListener() {
+
+        SwitchBluetooth = rootview.findViewById(R.id.bluetoothSwitch);
+        ButtonSearch = rootview.findViewById(R.id.searchButton);
+        ButtonPair = rootview.findViewById(R.id.pairbutton);
+        Status = rootview.findViewById(R.id.statusText);
+        List = rootview.findViewById(R.id.blueToothList);
+
+        if(activity.mBluetoothAdapter.isEnabled()){
+            Status.setText("블루투스 권한 허용");
+            SwitchBluetooth.setChecked(true);
+        }
+
+
+        SwitchBluetooth.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (compoundButton.isChecked()){
+                    activity.blueToothOn(Status);
+
+                }
+                else {
+                    Log.d("블루투스프레그먼트","스위치 꺼짐");
+                }
+            }
+        });
+
+
+        ButtonSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activity.selectDevice();
+            }
+        });
+
+
+        ButtonPair.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // 블루투스 동작
-
+                activity.sendData();
 
                 // 블루투스 정상적으로 동작했는지 확인하기
                 if(true){
@@ -63,6 +107,8 @@ public class BluetoothFragment extends Fragment {
                 }
             }
         });
+
+
 
         return rootview;
     }
