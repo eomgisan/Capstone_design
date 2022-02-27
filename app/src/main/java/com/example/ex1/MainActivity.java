@@ -28,6 +28,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -84,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
     byte[] userUid;
 
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+    // home 변수
     float weight1;
     float weight2;
     float smell;
@@ -91,6 +95,12 @@ public class MainActivity extends AppCompatActivity {
     float vol2;
     float temp;
     float humi;
+
+    //setting 변수
+    int laundryVol;
+    int pongpong;
+    int location;
+
 
 
 
@@ -377,7 +387,6 @@ public class MainActivity extends AppCompatActivity {
         catch(Exception e){
             e.printStackTrace();
             startToast("데이터 전송 오류");
-
         }
     }
 
@@ -586,6 +595,64 @@ public class MainActivity extends AppCompatActivity {
                                 // 데이터베이스에 회원정보 없으면 회원정보 입력 화면 전환
                                 Log.d(TAG, "No such document");
                                 startActivity(new Intent(MainActivity.this, UserInfoActivity.class));
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                }
+            });
+
+
+
+            // 세팅값 가져오기
+            docRef = db.collection("setting").document(user.getUid());
+
+            // document에서 불러오는 위 쿠드가 수행 완료시 동작
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                // DocumentSnapshot 자료형인 task에 결과를 저장
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+
+                        // 정상적으로 동작 했을 경우 document로 복사
+                        DocumentSnapshot document = task.getResult();
+
+                        if(document != null) {
+                            // document가 비어있을경우 확인
+                            if (document.exists()) {
+                                // 데이터베이스에서 회원정보 가져오기 document에 저장됨
+                                Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                laundryVol = Integer.parseInt(document.getData().get("volume").toString());
+                                location = Integer.parseInt(document.getData().get("location").toString());
+                                pongpong = Integer.parseInt(document.getData().get("pongpong").toString());
+
+
+                            } else {
+                                // 데이터베이스에 회원정보 없으면 회원정보 입력 화면 전환
+                                Log.d(TAG, "No such document");
+                                laundryVol = 0;
+                                location = 0;
+                                pongpong = 0;
+
+                                Setting setting = new Setting(location,pongpong,laundryVol);
+                                if (user!=null) {
+
+                                    db.collection("setting").document(user.getUid()).set(setting)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d(TAG,"설정정보 초기화 완료");
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d(TAG,"설정정보 초기화 실패");
+                                                }
+                                            });
+                                }
+
                             }
                         }
                     } else {
