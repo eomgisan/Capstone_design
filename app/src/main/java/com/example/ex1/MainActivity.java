@@ -7,15 +7,14 @@ import androidx.fragment.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
+import com.example.ex1.dataStructure.Setting;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -100,6 +99,19 @@ public class MainActivity extends AppCompatActivity {
 
 
 // 블루투스 관련 함수
+
+    protected void sendData(String string){
+        byte[] data = string.getBytes();
+        Log.d("blutoothSend",string);
+        try{
+            outputStream.write(data);
+            Log.d(TAG,"블루투스 통신 성공");
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            startToast("데이터 전송 오류");
+        }
+    }
 
 
 

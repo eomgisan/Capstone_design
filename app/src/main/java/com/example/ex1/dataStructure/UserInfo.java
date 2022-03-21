@@ -1,4 +1,4 @@
-package com.example.ex1;
+package com.example.ex1.dataStructure;
 
 // 회원정보 데이터를 위한 객채 선언 파일
 public class UserInfo {

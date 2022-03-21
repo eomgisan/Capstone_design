@@ -2,25 +2,39 @@ package com.example.ex1;
 
 import android.content.Context;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.ex1.decorator.BoldDecorator;
+import com.example.ex1.decorator.SaturdayDecorator;
+import com.example.ex1.decorator.SundayDecorator;
+import com.example.ex1.decorator.grayDecorator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
 
 
 public class RecommandFragment extends Fragment {
@@ -49,6 +63,9 @@ public class RecommandFragment extends Fragment {
 
 
 
+
+
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -64,7 +81,7 @@ public class RecommandFragment extends Fragment {
     }
 
     public void  checkDay(int cYear,int cMonth,int cDay,String userID){
-        fname=""+userID+cYear+"-"+(cMonth+1)+""+"-"+cDay+".txt";//저장할 파일 이름설정
+        fname=""+cYear+(cMonth+1)+cDay+".txt";//저장할 파일 이름설정
         FileInputStream fis = null;//FileStream fis 변수
 
         try{
@@ -73,6 +90,8 @@ public class RecommandFragment extends Fragment {
             byte[] fileData=new byte[fis.available()];
             fis.read(fileData);
             fis.close();
+
+
 
             str=new String(fileData);
 
@@ -155,6 +174,9 @@ public class RecommandFragment extends Fragment {
     }
 
 
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -175,7 +197,9 @@ public class RecommandFragment extends Fragment {
         calendarView = rootview.findViewById(R.id.calendarview);
         calendarView.addDecorators(
                 new SundayDecorator(),
-                new SaturdayDecorator()
+                new SaturdayDecorator(),
+                new BoldDecorator(),
+                new grayDecorator()
         );
 
 
@@ -183,27 +207,20 @@ public class RecommandFragment extends Fragment {
         String userName = activity.userName;
         textView3.setText(userName+"님의 월간 계획표");
 
-/*
-
-        calendarView.setOnDateChangedListener(new CalendarView.OnDateChangeListener() {
+        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 diaryTextView.setVisibility(View.VISIBLE);
                 save_Btn.setVisibility(View.VISIBLE);
                 contextEditText.setVisibility(View.VISIBLE);
                 textView2.setVisibility(View.INVISIBLE);
                 cha_Btn.setVisibility(View.INVISIBLE);
                 del_Btn.setVisibility(View.INVISIBLE);
-                diaryTextView.setText(String.format("%d / %d / %d",year,month+1,dayOfMonth));
+                diaryTextView.setText(String.format("%d / %d / %d",date.getYear(),date.getMonth()+1,date.getDay()));
                 contextEditText.setText("");
-                checkDay(year,month,dayOfMonth,user.getUid());
+                checkDay(date.getYear(), date.getMonth(), date.getDay(), user.getUid());
             }
         });
-
- */
-
-
-
 
 
         save_Btn.setOnClickListener(new View.OnClickListener() {
@@ -223,4 +240,6 @@ public class RecommandFragment extends Fragment {
 
         return rootview;
     }
+
+
 }

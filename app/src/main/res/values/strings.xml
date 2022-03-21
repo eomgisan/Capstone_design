@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ex1</string>
+    <string name="app_name">LEARNdry Bin</string>
     <string name="request_permission">This sample needs camera permission.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>

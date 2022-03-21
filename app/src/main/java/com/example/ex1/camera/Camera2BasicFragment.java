@@ -61,7 +61,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.ex1.AutoFitTextureView;
 import com.example.ex1.R;
 import com.example.ex1.UserInfoActivity;
 import com.google.android.gms.tasks.Continuation;

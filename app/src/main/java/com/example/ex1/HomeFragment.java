@@ -45,6 +45,7 @@ public class HomeFragment extends Fragment {
 
 
     MainActivity activity;
+    TextView usernameText;
     PieChart chart1;
     PieChart chart2;
     TextView weight1;
@@ -99,6 +100,7 @@ public class HomeFragment extends Fragment {
                             activity.vol1    = Float.parseFloat(document.getData().get("vol1").toString());
                             activity.vol2    = Float.parseFloat(document.getData().get("vol2").toString());
 
+                            usernameText.setText(String.valueOf(activity.userName+"님의 빨래통 상태"));
                             weight1.setText(String.valueOf(activity.weight1));
                             weight2.setText(String.valueOf(activity.weight2));
                             temp.setText(String.valueOf(activity.temp));
@@ -140,6 +142,8 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         ViewGroup rootview = (ViewGroup)inflater.inflate(R.layout.fragment_home,container,false);
 
+        usernameText = (TextView) rootview.findViewById(R.id.usernameText);
+
         chart1 = (PieChart) rootview.findViewById(R.id.piechart1);
         chart2 = (PieChart) rootview.findViewById(R.id.piechart2);
         weight1 = (TextView) rootview.findViewById(R.id.weight1);
@@ -160,9 +164,7 @@ public class HomeFragment extends Fragment {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // TODO : 블루투스 통신으로 재측정 하라는 신호 보내기
-
+                activity.sendData("재측정 신호!!!!!!!!!!!!!");
                 init();
             }
         });

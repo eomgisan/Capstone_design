@@ -334,7 +334,7 @@ public class BluetoothFragment extends Fragment {
         thread.start(); // 별도 스레드 시작
     }
 
-    protected void sendData(){
+    protected void sendUid(){
         activity.userUid = activity.user.getUid().getBytes();
         Log.d(TAG,activity.userUid.toString());
         try{
@@ -402,7 +402,7 @@ public class BluetoothFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // 블루투스 동작
-                sendData();
+                sendUid();
 
                 // 블루투스 정상적으로 동작했는지 확인하기
                 if(true){
