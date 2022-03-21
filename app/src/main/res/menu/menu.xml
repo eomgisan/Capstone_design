@@ -11,7 +11,7 @@
         android:id="@+id/menu_recommand"
         android:icon="@drawable/recommand"
         android:enabled="true"
-        android:title="날짜추천" />
+        android:title="캘린더" />
 
     <item
         android:id="@+id/menu_home"
@@ -20,15 +20,17 @@
         android:title="홈" />
 
     <item
+        android:id="@+id/menu_feature"
+        android:icon="@drawable/logout"
+        android:enabled="true"
+        android:title="사용자분석" />
+
+    <item
         android:id="@+id/menu_community"
         android:icon="@drawable/community"
         android:enabled="true"
         android:title="커뮤니티" />
 
-    <item
-        android:id="@+id/menu_logout"
-        android:icon="@drawable/logout"
-        android:enabled="true"
-        android:title="로그아웃" />
+
 
 </menu>

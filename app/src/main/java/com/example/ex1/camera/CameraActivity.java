@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.example.ex1;
+package com.example.ex1.camera;
 
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.ex1.R;
 
 public class CameraActivity extends AppCompatActivity {
 

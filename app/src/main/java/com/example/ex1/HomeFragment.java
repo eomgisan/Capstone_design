@@ -1,6 +1,8 @@
 package com.example.ex1;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -30,6 +32,8 @@ import com.google.firebase.storage.StorageReference;
 import org.eazegraph.lib.charts.PieChart;
 import org.eazegraph.lib.models.PieModel;
 
+import java.io.IOException;
+
 
 public class HomeFragment extends Fragment {
 
@@ -51,6 +55,7 @@ public class HomeFragment extends Fragment {
 
     Button refresh;
     Button goToBlueTooth;
+    Button logOut;
 
     @Override
     public void onAttach(Context context) {
@@ -67,43 +72,42 @@ public class HomeFragment extends Fragment {
     }
 
     private void init(){
+
         // 데이터베이스 users 콜렉션 안에서 사용자 회원별 uid document로 접속
-                                    DocumentReference docRef = db.collection("datas").document(user.getUid());
+        DocumentReference docRef = db.collection("datas").document(user.getUid());
 
-                            // document에서 불러오는 위 쿠드가 수행 완료시 동작
-                            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                // DocumentSnapshot 자료형인 task에 결과를 저장
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful()) {
+        // document에서 불러오는 위 쿠드가 수행 완료시 동작
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            // DocumentSnapshot 자료형인 task에 결과를 저장
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    // 정상적으로 동작 했을 경우 document로 복사
+                    DocumentSnapshot document = task.getResult();
 
-                                        // 정상적으로 동작 했을 경우 document로 복사
-                                        DocumentSnapshot document = task.getResult();
+                    if(document != null) {
+                        // document가 비어있을경우 확인
+                        if (document.exists()) {
+                            // 데이터베이스에서 센서 정보 가져오기
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
 
-                                        if(document != null) {
-                                            // document가 비어있을경우 확인
-                                            if (document.exists()) {
-                                                // 데이터베이스에서 센서 정보 가져오기
-                                                Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            activity.weight1 = Float.parseFloat(document.getData().get("weight1").toString());
+                            activity.weight2 = Float.parseFloat(document.getData().get("weight2").toString());
+                            activity.smell   = Float.parseFloat(document.getData().get("smell").toString());
+                            activity.temp    = Float.parseFloat(document.getData().get("temp").toString());
+                            activity.humi    = Float.parseFloat(document.getData().get("humi").toString());
+                            activity.vol1    = Float.parseFloat(document.getData().get("vol1").toString());
+                            activity.vol2    = Float.parseFloat(document.getData().get("vol2").toString());
 
+                            weight1.setText(String.valueOf(activity.weight1));
+                            weight2.setText(String.valueOf(activity.weight2));
+                            temp.setText(String.valueOf(activity.temp));
+                            humi.setText(String.valueOf(activity.humi));
+                            smell.setText(String.valueOf(activity.smell));
 
-                                                activity.weight1 = Float.parseFloat(document.getData().get("weight1").toString());
-                                                activity.weight2 = Float.parseFloat(document.getData().get("weight2").toString());
-                                                activity.smell   = Float.parseFloat(document.getData().get("smell").toString());
-                                                activity.temp    = Float.parseFloat(document.getData().get("temp").toString());
-                                                activity.humi    = Float.parseFloat(document.getData().get("humi").toString());
-                                                activity.vol1    = Float.parseFloat(document.getData().get("vol1").toString());
-                                                activity.vol2    = Float.parseFloat(document.getData().get("vol2").toString());
-
-                                                weight1.setText(String.valueOf(activity.weight1));
-                                                weight2.setText(String.valueOf(activity.weight2));
-                                                temp.setText(String.valueOf(activity.temp));
-                                                humi.setText(String.valueOf(activity.humi));
-                                                smell.setText(String.valueOf(activity.smell));
-
-                                                chart1.addPieSlice(new PieModel("빨래통 1", activity.vol1, Color.parseColor("#CDA67F")));
-                                                chart1.addPieSlice(new PieModel("남은공간 1", 100-activity.vol1, Color.parseColor("#FE6DA8")));
-                                                chart2.addPieSlice(new PieModel("빨래통 2", activity.vol2, Color.parseColor("#CDA67F")));
+                            chart1.addPieSlice(new PieModel("빨래통 1", activity.vol1, Color.parseColor("#CDA67F")));
+                            chart1.addPieSlice(new PieModel("남은공간 1", 100-activity.vol1, Color.parseColor("#FE6DA8")));
+                            chart2.addPieSlice(new PieModel("빨래통 2", activity.vol2, Color.parseColor("#CDA67F")));
                             chart2.addPieSlice(new PieModel("남은공간 2", 100-activity.vol2, Color.parseColor("#FE6DA8")));
 
                             chart1.startAnimation();
@@ -146,6 +150,7 @@ public class HomeFragment extends Fragment {
 
         refresh = (Button) rootview.findViewById(R.id.refreshBTN) ;
         goToBlueTooth = rootview.findViewById(R.id.goTOBluetooth);
+        logOut = rootview.findViewById(R.id.logOut);
 
 // 여기에 동작부분 넣기
         mAuth = FirebaseAuth.getInstance();
@@ -157,7 +162,7 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
 
                 // TODO : 블루투스 통신으로 재측정 하라는 신호 보내기
-                activity.sendData();
+
                 init();
             }
         });
@@ -176,6 +181,38 @@ public class HomeFragment extends Fragment {
                         .commit();
             }
         });
+
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onNavigationItemSelected: logout button clicked");
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setTitle("확인");
+                builder.setMessage("로그아웃 하시겠습니까?");
+                builder.setPositiveButton("예",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                FirebaseAuth.getInstance().signOut();
+                                startActivity(new Intent(activity, LoginActivity.class));
+
+                            }
+                        });
+                builder.setNegativeButton("아니오",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                activity.onBackPressed();
+                            }
+                        });
+
+                AlertDialog alertDialog = builder.create();
+
+                alertDialog.show();
+            }
+        });
+
+
 
 
 
