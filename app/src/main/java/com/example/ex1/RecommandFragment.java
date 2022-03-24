@@ -1,5 +1,6 @@
 package com.example.ex1;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.ex1.decorator.BoldDecorator;
+import com.example.ex1.decorator.EventDecorator;
 import com.example.ex1.decorator.SaturdayDecorator;
 import com.example.ex1.decorator.SundayDecorator;
 import com.example.ex1.decorator.grayDecorator;
@@ -29,10 +32,13 @@ import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 
@@ -81,55 +87,23 @@ public class RecommandFragment extends Fragment {
     }
 
     public void  checkDay(int cYear,int cMonth,int cDay,String userID){
-        fname=""+cYear+(cMonth+1)+cDay+".txt";//저장할 파일 이름설정
+
+        fname=""+cYear+"-"+(cMonth+1)+"-"+cDay+".txt";//저장할 파일 이름설정
         FileInputStream fis = null;//FileStream fis 변수
 
         try{
+
             fis = activity.openFileInput(fname);
+
 
             byte[] fileData=new byte[fis.available()];
             fis.read(fileData);
             fis.close();
 
-
-
             str=new String(fileData);
 
-            contextEditText.setVisibility(View.INVISIBLE);
-            textView2.setVisibility(View.VISIBLE);
-            textView2.setText(str);
-
-            save_Btn.setVisibility(View.INVISIBLE);
-            cha_Btn.setVisibility(View.VISIBLE);
-            del_Btn.setVisibility(View.VISIBLE);
-
-            cha_Btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    contextEditText.setVisibility(View.VISIBLE);
-                    textView2.setVisibility(View.INVISIBLE);
-                    contextEditText.setText(str);
-
-                    save_Btn.setVisibility(View.VISIBLE);
-                    cha_Btn.setVisibility(View.INVISIBLE);
-                    del_Btn.setVisibility(View.INVISIBLE);
-                    textView2.setText(contextEditText.getText());
-                }
-
-            });
-            del_Btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    textView2.setVisibility(View.INVISIBLE);
-                    contextEditText.setText("");
-                    contextEditText.setVisibility(View.VISIBLE);
-                    save_Btn.setVisibility(View.VISIBLE);
-                    cha_Btn.setVisibility(View.INVISIBLE);
-                    del_Btn.setVisibility(View.INVISIBLE);
-                    removeDiary(fname);
-                }
-            });
             if(textView2.getText()==null){
+
                 textView2.setVisibility(View.INVISIBLE);
                 diaryTextView.setVisibility(View.VISIBLE);
                 save_Btn.setVisibility(View.VISIBLE);
@@ -137,23 +111,36 @@ public class RecommandFragment extends Fragment {
                 del_Btn.setVisibility(View.INVISIBLE);
                 contextEditText.setVisibility(View.VISIBLE);
             }
+            else{
+                contextEditText.setVisibility(View.INVISIBLE);
+                textView2.setVisibility(View.VISIBLE);
+                textView2.setText(str);
+
+
+
+                save_Btn.setVisibility(View.INVISIBLE);
+                cha_Btn.setVisibility(View.VISIBLE);
+                del_Btn.setVisibility(View.VISIBLE);
+
+
+            }
+
+
 
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-
+    @SuppressLint("WrongConstant")
     public void removeDiary(String readDay){
         FileOutputStream fos=null;
 
         try{
 
-            fos=activity.openFileOutput(readDay,Context.MODE_PRIVATE);
-            String content="";
-            fos.write((content).getBytes());
-            fos.close();
-
+            String dir = activity.getFilesDir().getAbsolutePath();
+            File f0 = new File(dir, readDay);
+            boolean d0 = f0.delete();
 
         }catch (Exception e){
             e.printStackTrace();
@@ -168,9 +155,35 @@ public class RecommandFragment extends Fragment {
             String content=contextEditText.getText().toString();
             fos.write((content).getBytes());
             fos.close();
+
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void findEvent(ArrayList<CalendarDay> eventList) {
+        eventList.clear();
+
+        String dir = activity.getFilesDir().getAbsolutePath();;
+
+        String[] mylist = activity.fileList();
+
+
+        for(int i=0;i< mylist.length;i++){
+
+            String[] dates = mylist[i].substring(0,mylist[i].length()-4).split("-");
+
+            if(dates.length == 3 && dates[0].length() == 4 && dates[1].length() <3 &&dates[1].length() >0 && dates[2].length() <3 &&dates[2].length() >0){
+                int year = Integer.parseInt(dates[0]);
+                int month = Integer.parseInt(dates[1])-1;
+                int day = Integer.parseInt(dates[2]);
+
+                eventList.add(CalendarDay.from(year,month,day));
+            }
+
+        }
+        Log.d("지금1",eventList.toString());
+
     }
 
 
@@ -183,6 +196,10 @@ public class RecommandFragment extends Fragment {
 
         View rootview = inflater.inflate(R.layout.fragment_recommand, container, false);
 
+
+        ArrayList<CalendarDay> eventList = new ArrayList<>();
+
+        findEvent(eventList);
 
 
 
@@ -199,8 +216,10 @@ public class RecommandFragment extends Fragment {
                 new SundayDecorator(),
                 new SaturdayDecorator(),
                 new BoldDecorator(),
-                new grayDecorator()
+                new grayDecorator(),
+                new EventDecorator(eventList)
         );
+
 
 
 
@@ -210,6 +229,7 @@ public class RecommandFragment extends Fragment {
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+
                 diaryTextView.setVisibility(View.VISIBLE);
                 save_Btn.setVisibility(View.VISIBLE);
                 contextEditText.setVisibility(View.VISIBLE);
@@ -223,9 +243,11 @@ public class RecommandFragment extends Fragment {
         });
 
 
+
         save_Btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 saveDiary(fname);
                 str=contextEditText.getText().toString();
                 textView2.setText(str);
@@ -234,6 +256,39 @@ public class RecommandFragment extends Fragment {
                 del_Btn.setVisibility(View.VISIBLE);
                 contextEditText.setVisibility(View.INVISIBLE);
                 textView2.setVisibility(View.VISIBLE);
+                calendarView.removeDecorator(new EventDecorator(eventList));
+                findEvent(eventList);
+                calendarView.addDecorator(new EventDecorator(eventList));
+
+            }
+        });
+
+        cha_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                contextEditText.setVisibility(View.VISIBLE);
+                textView2.setVisibility(View.INVISIBLE);
+                contextEditText.setText(str);
+
+                save_Btn.setVisibility(View.VISIBLE);
+                cha_Btn.setVisibility(View.INVISIBLE);
+                del_Btn.setVisibility(View.INVISIBLE);
+                textView2.setText(contextEditText.getText());
+            }
+
+        });
+        del_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                textView2.setVisibility(View.INVISIBLE);
+                contextEditText.setText("");
+                contextEditText.setVisibility(View.VISIBLE);
+                save_Btn.setVisibility(View.VISIBLE);
+                cha_Btn.setVisibility(View.INVISIBLE);
+                del_Btn.setVisibility(View.INVISIBLE);
+                removeDiary(fname);
 
             }
         });

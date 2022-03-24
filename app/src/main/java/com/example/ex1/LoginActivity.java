@@ -1,6 +1,10 @@
 package com.example.ex1;
 
+
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -68,8 +72,12 @@ public class LoginActivity extends AppCompatActivity {
         }
     };
 
+
+
     // 로그인 버튼 클릭시 동작하는 함수
     private void Login(){
+
+
 
         // 로그인xml 파일에 있는 이메일과 패스워드 텍스트를 가져옴
         String email = ((EditText)findViewById(R.id.loginEmail)).getText().toString();

@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.example.ex1.dataStructure.Setting;
+import com.example.ex1.network.NetworkManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -126,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         } catch(IOException e) {
             e.printStackTrace();
         }
+        FirebaseAuth.getInstance().signOut();
         //unregisterReceiver(mReceiver);
         super.onDestroy();
     }
@@ -137,6 +139,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        NetworkManager network = new NetworkManager(getApplicationContext());
+        network.registerNetworkCallback();
+
+        // Check network connection
+        if (Variables.isNetworkConnected()){
+            // Internet Connected
+        }else{
+            // Not Connected
+        }
 
         // xml 설정
         setContentView(R.layout.activity_main);
@@ -412,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
     long pressedTime = 0; //'뒤로가기' 버튼 클릭했을 때의 시간
     @Override
     public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount() == 0){
+        if(getSupportFragmentManager().getBackStackEntryCount() == 1){
             //마지막으로 누른 '뒤로가기' 버튼 클릭 시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 크면
             if(System.currentTimeMillis() > pressedTime + 2000){
                 //현재 시간을 pressedTime 에 저장
