@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
     android:orientation="vertical"
     tools:context=".BluetoothFragment">
 
@@ -18,26 +19,52 @@
     <Switch
         android:id="@+id/bluetoothSwitch"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="블루투스 ON/OFF" />
+        android:layout_height="103dp"
+        android:text="블루투스 ON/OFF"
+        android:textSize="20dp" />
 
-    <Button
-        android:id="@+id/searchButton"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="페어링 가능 장치 탐색" />
+        android:layout_height="103dp"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-    <ListView
-        android:id="@+id/blueToothList"
-        android:layout_width="match_parent"
-        android:layout_height="380dp">
+        <Button
+            android:id="@+id/searchButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="기존 페어링 장치 탐색" />
 
-    </ListView>
+        <Button
+            android:id="@+id/searchButton2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="새로운 장치 탐색" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/pairbutton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="블루투스 연결" />
+        android:text="빨래통으로 사용자 정보 전송" />
+
+    <TextView
+        android:id="@+id/successText"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:layout_gravity="center"
+        android:textSize="20dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="208dp" />
+
+    <Button
+        android:id="@+id/goToHomeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="홈화면 돌아가기" />
 
 </LinearLayout>
