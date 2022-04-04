@@ -84,13 +84,14 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     // home 변수
-    float weight1;
-    float weight2;
-    float smell;
-    float vol1;
-    float vol2;
-    float temp;
-    float humi;
+    double weight1;
+    double weight2;
+    double smell;
+    double temp;
+    double hum;
+
+    double vol1;
+    double vol2;
 
     //setting 변수
     int laundryVol;
@@ -159,6 +160,9 @@ public class MainActivity extends AppCompatActivity {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mBluetoothAdapter.disable();
         startFirebase();
+
+        //크롤링 수행
+
 
     }
 
@@ -375,6 +379,9 @@ public class MainActivity extends AppCompatActivity {
                                 location = Integer.parseInt(document.getData().get("location").toString());
                                 pongpong = Integer.parseInt(document.getData().get("pongpong").toString());
 
+                                vol1 = (weight1/laundryVol)*100;
+                                vol2 = (weight2/laundryVol)*100;
+
 
                             } else {
                                 // 데이터베이스에 회원정보 없으면 회원정보 입력 화면 전환
@@ -382,6 +389,8 @@ public class MainActivity extends AppCompatActivity {
                                 laundryVol = 0;
                                 location = 0;
                                 pongpong = 0;
+                                vol1 = -1;
+                                vol2 = -1;
 
                                 Setting setting = new Setting(location,pongpong,laundryVol);
                                 if (user!=null) {
@@ -410,6 +419,8 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
+
+    // 크롤링 수행!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 

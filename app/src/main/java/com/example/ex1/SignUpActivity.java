@@ -9,11 +9,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.ex1.dataStructure.Datas;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 // 회원가입 엑티비티
 public class SignUpActivity  extends AppCompatActivity {
@@ -73,9 +78,33 @@ public class SignUpActivity  extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     // Sign in success, update UI with the signed-in user's information
-                                    startToast("회원가입에 성공하였습니다.");
+
                                     FirebaseUser user = mAuth.getCurrentUser();
+                                    startToast("회원가입에 성공하였습니다.");
                                     //성공시 로직
+                                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                    Datas datas = new Datas(0.0,0.0,0.0,0.0,0.0);
+
+                                    if (user!=null) {
+
+                                        db.collection("datas").document(user.getUid()).set(datas)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+
+                                                        startToast("로그인을 진행해 주세요.");
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        startToast(e.toString());
+                                                    }
+                                                });
+                                    }
+
+
+
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     if (task.getException() != null) {

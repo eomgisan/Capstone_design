@@ -46,12 +46,14 @@ public class HomeFragment extends Fragment {
 
     MainActivity activity;
     TextView usernameText;
-    PieChart chart1;
-    PieChart chart2;
+
+    ImageView BinImage1;
+    ImageView BinImage2;
+
     TextView weight1;
     TextView weight2;
     TextView temp;
-    TextView humi;
+    TextView hum;
     TextView smell;
 
     Button refresh;
@@ -92,28 +94,51 @@ public class HomeFragment extends Fragment {
                             // 데이터베이스에서 센서 정보 가져오기
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
 
-                            activity.weight1 = Float.parseFloat(document.getData().get("weight1").toString());
-                            activity.weight2 = Float.parseFloat(document.getData().get("weight2").toString());
-                            activity.smell   = Float.parseFloat(document.getData().get("smell").toString());
-                            activity.temp    = Float.parseFloat(document.getData().get("temp").toString());
-                            activity.humi    = Float.parseFloat(document.getData().get("humi").toString());
-                            activity.vol1    = Float.parseFloat(document.getData().get("vol1").toString());
-                            activity.vol2    = Float.parseFloat(document.getData().get("vol2").toString());
+                            activity.weight1 = Double.parseDouble(document.getData().get("weight1").toString());
+                            activity.weight2 = Double.parseDouble(document.getData().get("weight2").toString());
+                            activity.smell   = Double.parseDouble(document.getData().get("smell").toString());
+                            activity.temp    = Double.parseDouble(document.getData().get("temp").toString());
+                            activity.hum    = Double.parseDouble(document.getData().get("hum").toString());
 
                             usernameText.setText(String.valueOf(activity.userName+"님의 빨래통 상태"));
                             weight1.setText(String.valueOf(activity.weight1));
                             weight2.setText(String.valueOf(activity.weight2));
                             temp.setText(String.valueOf(activity.temp));
-                            humi.setText(String.valueOf(activity.humi));
+                            hum.setText(String.valueOf(activity.hum));
                             smell.setText(String.valueOf(activity.smell));
 
-                            chart1.addPieSlice(new PieModel("빨래통 1", activity.vol1, Color.parseColor("#CDA67F")));
-                            chart1.addPieSlice(new PieModel("남은공간 1", 100-activity.vol1, Color.parseColor("#FE6DA8")));
-                            chart2.addPieSlice(new PieModel("빨래통 2", activity.vol2, Color.parseColor("#CDA67F")));
-                            chart2.addPieSlice(new PieModel("남은공간 2", 100-activity.vol2, Color.parseColor("#FE6DA8")));
+                            if(activity.vol1 <0){
+                                BinImage1.setImageResource(R.drawable.add);
+                            }
+                            else if(activity.vol1 <50){
+                                BinImage1.setImageResource(R.drawable.add);
+                                BinImage1.setBackgroundColor(Color.GREEN);
+                            }
+                            else if(activity.vol1 <80){
+                                BinImage1.setImageResource(R.drawable.add);
+                                BinImage1.setBackgroundColor(Color.YELLOW);
+                            }
+                            else{
+                                BinImage1.setImageResource(R.drawable.add);
+                                BinImage1.setBackgroundColor(Color.RED);
+                            }
 
-                            chart1.startAnimation();
-                            chart2.startAnimation();
+                            if(activity.vol2 <0){
+                                BinImage2.setImageResource(R.drawable.add);
+                            }
+                            else if(activity.vol2 <50){
+                                BinImage2.setImageResource(R.drawable.add);
+                                BinImage2.setBackgroundColor(Color.GREEN);
+                            }
+                            else if(activity.vol2 <80){
+                                BinImage2.setImageResource(R.drawable.add);
+                                BinImage2.setBackgroundColor(Color.YELLOW);
+                            }
+                            else{
+                                BinImage2.setImageResource(R.drawable.add);
+                                BinImage2.setBackgroundColor(Color.RED);
+                            }
+
 
                         } else {
                             // 데이터베이스에 회원정보 없으면 블루투스 프레그먼트 전환
@@ -144,13 +169,14 @@ public class HomeFragment extends Fragment {
 
         usernameText = (TextView) rootview.findViewById(R.id.usernameText);
 
-        chart1 = (PieChart) rootview.findViewById(R.id.piechart1);
-        chart2 = (PieChart) rootview.findViewById(R.id.piechart2);
         weight1 = (TextView) rootview.findViewById(R.id.weight1);
         weight2 = (TextView) rootview.findViewById(R.id.weight2);
         temp = (TextView) rootview.findViewById(R.id.temp);
-        humi = (TextView) rootview.findViewById(R.id.humi);
+        hum = (TextView) rootview.findViewById(R.id.humi);
         smell = (TextView) rootview.findViewById(R.id.smell);
+
+        BinImage1 = (ImageView) rootview.findViewById(R.id.BinImage1);
+        BinImage2 = (ImageView) rootview.findViewById(R.id.BinImage2);
 
         refresh = (Button) rootview.findViewById(R.id.refreshBTN) ;
         goToBlueTooth = rootview.findViewById(R.id.goTOBluetooth);
