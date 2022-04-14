@@ -8,6 +8,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.ex1.dataStructure.Datas;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,11 +21,29 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 
 // 회원가입 엑티비티
 public class SignUpActivity  extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-    private static final String TAG = "SignUpActivity";
+
+    public FirebaseAuth mAuth;
+    public FirebaseUser user;
+    public static final String TAG = "SignUpActivity";
+
+    String userId;
+    String loginEmail;
+    String loginPassword;
+
+    Fragment signUpFM = new SignUpFragment();
+    Fragment userInfoFM = new UserInfoFragment();
+
+
+
+
+
+
+    FirebaseFirestore db;
+
 
 
     @Override
@@ -33,98 +53,59 @@ public class SignUpActivity  extends AppCompatActivity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-        findViewById(R.id.signUpButton).setOnClickListener(onClickListener);
-        findViewById(R.id.goToLogin).setOnClickListener(onClickListener);
+        getSupportFragmentManager().popBackStack("signUp", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.signUp_ly, signUpFM,"signUp")
+                .setReorderingAllowed(true)
+                .addToBackStack("signUpFM")
+                .commitAllowingStateLoss();
+
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+    public void goToSignUpFM(){
+        getSupportFragmentManager()
+                .popBackStack("userInfo", FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-    }
-    View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()){
-                case R.id.signUpButton:
-                    // 회원가입 버튼 클릭시 signUp 함수 동작
-                    signUp();
-                    break;
-                case R.id.goToLogin:
-                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    break;
-            }
-        }
-    };
-
-    private void signUp(){
-
-        String email = ((EditText)findViewById(R.id.loginEmail)).getText().toString();
-        String password = ((EditText)findViewById(R.id.loginPassword)).getText().toString();
-        String passwordCheck = ((EditText)findViewById(R.id.loginPassword2)).getText().toString();
-
-        if(email.length()>0 && password.length() > 0 && password.length() >0){
-
-
-            if (password.equals(passwordCheck)) {
-
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    startToast("회원가입에 성공하였습니다.");
-                                    //성공시 로직
-                                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                    Datas datas = new Datas(0.0,0.0,0.0,0.0,0.0);
-
-                                    if (user!=null) {
-
-                                        db.collection("datas").document(user.getUid()).set(datas)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-
-                                                        startToast("로그인을 진행해 주세요.");
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        startToast(e.toString());
-                                                    }
-                                                });
-                                    }
-
-
-
-                                } else {
-                                    // If sign in fails, display a message to the user.
-                                    if (task.getException() != null) {
-                                        startToast(task.getException().toString());
-                                    }
-                                    //실패시 로직
-                                }
-                            }
-                        });
-            } else {
-                Toast.makeText(this, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
-            }
-        }else{
-            startToast("이메일 또는 비밀번호를 입력해주세요.");
-        }
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.signUp_ly, userInfoFM,"userInfo")
+                .setReorderingAllowed(true)
+                .addToBackStack("userInfoFM")
+                .commit();
     }
 
-    private void startToast( String msg){
+
+    public void startToast( String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    // 뒤로가기시 앱 종료 함수
+
+    long pressedTime = 0; //'뒤로가기' 버튼 클릭했을 때의 시간
+    @Override
+    public void onBackPressed() {
+            //마지막으로 누른 '뒤로가기' 버튼 클릭 시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 크면
+            if(System.currentTimeMillis() > pressedTime + 2000){
+                //현재 시간을 pressedTime 에 저장
+                pressedTime = System.currentTimeMillis();
+                Toast.makeText(getApplicationContext(),"한번 더 누르면 종료", Toast.LENGTH_SHORT).show();
+            }
+
+            //마지막 '뒤로가기' 버튼 클릭시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 작으면
+            else{
+                Toast.makeText(getApplicationContext(),"종료 완료", Toast.LENGTH_SHORT).show();
+                if(user != null){
+                    user.delete();
+                }
+                // 앱 종료
+                moveTaskToBack(true); // 태스크를 백그라운드로 이동
+                finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
+
+                System.exit(0);
+            }
+    }
 
 }

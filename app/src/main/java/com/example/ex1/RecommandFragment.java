@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.ex1.decorator.BoldDecorator;
 import com.example.ex1.decorator.EventDecorator;
+import com.example.ex1.decorator.MainDecorator;
 import com.example.ex1.decorator.SaturdayDecorator;
 import com.example.ex1.decorator.SundayDecorator;
 import com.example.ex1.decorator.grayDecorator;
@@ -34,9 +35,12 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
+import org.json.JSONException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -47,17 +51,12 @@ public class RecommandFragment extends Fragment {
 
     MainActivity activity;
 
-
-
-    private FirebaseAuth mAuth;
-    // 데이터베이스 초기화
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseUser user;
     String TAG = "recommandFragment";
 
 
-    String fname=null;
-    String str=null;
+    String fname;
+    String str;
 
     Button cha_Btn,del_Btn,save_Btn;
     TextView diaryTextView,textView2,textView3;
@@ -182,8 +181,6 @@ public class RecommandFragment extends Fragment {
             }
 
         }
-        Log.d("지금1",eventList.toString());
-
     }
 
 
@@ -193,15 +190,17 @@ public class RecommandFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        fname = null;
+        str = null;
+        user = activity.user;
 
         View rootview = inflater.inflate(R.layout.fragment_recommand, container, false);
+
 
 
         ArrayList<CalendarDay> eventList = new ArrayList<>();
 
         findEvent(eventList);
-
-
 
         fragmentFrame=rootview.findViewById(R.id.fragmentFrame);
         diaryTextView=rootview.findViewById(R.id.diaryTextView);
@@ -212,6 +211,7 @@ public class RecommandFragment extends Fragment {
         textView3=rootview.findViewById(R.id.textView3);
         contextEditText=rootview.findViewById(R.id.contextEditText);
         calendarView = rootview.findViewById(R.id.calendarview);
+
         calendarView.addDecorators(
                 new SundayDecorator(),
                 new SaturdayDecorator(),
@@ -220,15 +220,21 @@ public class RecommandFragment extends Fragment {
                 new EventDecorator(eventList)
         );
 
+        if(activity.apiFinish == true){
+            calendarView.addDecorator(new MainDecorator(eventList));
+        }
 
 
 
-        String userName = activity.userName;
+
+        String userName = activity.userInfo.getName();
         textView3.setText(userName+"님의 월간 계획표");
+
 
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+
 
                 diaryTextView.setVisibility(View.VISIBLE);
                 save_Btn.setVisibility(View.VISIBLE);
@@ -239,6 +245,8 @@ public class RecommandFragment extends Fragment {
                 diaryTextView.setText(String.format("%d / %d / %d",date.getYear(),date.getMonth()+1,date.getDay()));
                 contextEditText.setText("");
                 checkDay(date.getYear(), date.getMonth(), date.getDay(), user.getUid());
+
+
             }
         });
 

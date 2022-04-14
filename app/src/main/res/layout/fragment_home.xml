@@ -51,7 +51,7 @@
             <ImageView
                 android:id="@+id/BinImage1"
                 android:layout_width="match_parent"
-                android:layout_height="310dp"
+                android:layout_height="260dp"
                 android:src="@drawable/add" />
 
             <LinearLayout
@@ -90,7 +90,7 @@
             <ImageView
                 android:id="@+id/BinImage2"
                 android:layout_width="match_parent"
-                android:layout_height="310dp"
+                android:layout_height="260dp"
                 android:src="@drawable/add" />
 
             <LinearLayout

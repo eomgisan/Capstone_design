@@ -2,20 +2,49 @@ package com.example.ex1.dataStructure;
 
 public class Datas {
 
-    private Double hum;
+    private Double humidity;
     private Double smell;
-    private Double temp;
+    private Double temperature;
     private Double weight1;
     private Double weight2;
 
+    public boolean isnull;
 
+    public Datas() {
+        isnull = true;
+    }
 
-    public Datas(Double hum, Double smell, Double temp ,Double weight1, Double weight2){
-        this.hum = hum;
+    public Datas(Double humidity, Double smell, Double temperature, Double weight1, Double weight2) {
+        this.humidity = humidity;
         this.smell = smell;
-        this.temp = temp;
+        this.temperature = temperature;
         this.weight1 = weight1;
         this.weight2 = weight2;
+        isnull = false;
+    }
+
+    public Double getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(Double humidity) {
+        this.humidity = humidity;
+    }
+
+    public Double getSmell() {
+        return smell;
+    }
+
+    public void setSmell(Double smell) {
+        this.smell = smell;
+    }
+
+    public Double getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(Double temperature) {
+        this.temperature = temperature;
     }
 
     public Double getWeight1() {
@@ -32,29 +61,5 @@ public class Datas {
 
     public void setWeight2(Double weight2) {
         this.weight2 = weight2;
-    }
-
-    public Double getSmell() {
-        return smell;
-    }
-
-    public void setSmell(Double smell) {
-        this.smell = smell;
-    }
-
-    public Double getTemp() {
-        return temp;
-    }
-
-    public void setTemp(Double temp) {
-        this.temp = temp;
-    }
-
-    public Double getHum() {
-        return hum;
-    }
-
-    public void setHum(Double hum) {
-        this.hum = hum;
     }
 }

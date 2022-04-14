@@ -77,8 +77,6 @@ public class LoginActivity extends AppCompatActivity {
     // 로그인 버튼 클릭시 동작하는 함수
     private void Login(){
 
-
-
         // 로그인xml 파일에 있는 이메일과 패스워드 텍스트를 가져옴
         String email = ((EditText)findViewById(R.id.loginEmail)).getText().toString();
         String password = ((EditText)findViewById(R.id.loginPassword)).getText().toString();

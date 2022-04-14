@@ -8,6 +8,16 @@
     android:layout_margin="5dp">
 
     <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_height="93dp"
+        android:gravity="center"
+        android:text="설정"
+        android:textColor="#673AB7"
+        android:textSize="50dp"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,11 +99,6 @@
         android:layout_height="51dp" />
 
 
-    <Button
-        android:id="@+id/setting_complete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="수정내용 저장" />
 
     <TextView
         android:id="@+id/textView5"
@@ -117,7 +122,7 @@
         android:textStyle="bold" />
 
     <Button
-        android:id="@+id/goToUserInfo"
+        android:id="@+id/uploadSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="개인정보 수정하기" />

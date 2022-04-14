@@ -6,11 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,29 +15,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import org.eazegraph.lib.charts.PieChart;
-import org.eazegraph.lib.models.PieModel;
-
-import java.io.IOException;
 
 
 public class HomeFragment extends Fragment {
 
-    private FirebaseAuth mAuth;
-    // 데이터베이스 초기화
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
     String TAG = "homeFragment";
 
 
@@ -74,92 +56,61 @@ public class HomeFragment extends Fragment {
         activity = null;
     }
 
-    private void init(){
+    private void init() {
+        activity.startFirebase();
+        // document가 비어있을경우 확인
+        if (activity.datas.isnull == true) {
+            // 데이터베이스에 센서 정보 없으면 블루투스 프레그먼트 전환
+            Log.d(TAG, "No such sensorData");
 
-        // 데이터베이스 users 콜렉션 안에서 사용자 회원별 uid document로 접속
-        DocumentReference docRef = db.collection("datas").document(user.getUid());
+            getActivity().getSupportFragmentManager()
+                    .popBackStack("home", FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-        // document에서 불러오는 위 쿠드가 수행 완료시 동작
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            // DocumentSnapshot 자료형인 task에 결과를 저장
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    // 정상적으로 동작 했을 경우 document로 복사
-                    DocumentSnapshot document = task.getResult();
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_ly, new BluetoothFragment(), "bluetooth")
+                    .setReorderingAllowed(true)
+                    .addToBackStack("bluetoothFM")
+                    .commit();
 
-                    if(document != null) {
-                        // document가 비어있을경우 확인
-                        if (document.exists()) {
-                            // 데이터베이스에서 센서 정보 가져오기
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+        } else {
 
-                            activity.weight1 = Double.parseDouble(document.getData().get("weight1").toString());
-                            activity.weight2 = Double.parseDouble(document.getData().get("weight2").toString());
-                            activity.smell   = Double.parseDouble(document.getData().get("smell").toString());
-                            activity.temp    = Double.parseDouble(document.getData().get("temp").toString());
-                            activity.hum    = Double.parseDouble(document.getData().get("hum").toString());
+            usernameText.setText(String.valueOf(activity.userInfo.getName() + "님의 빨래통 상태"));
+            weight1.setText(String.valueOf(activity.datas.getWeight1()));
+            weight2.setText(String.valueOf(activity.datas.getWeight2()));
+            temp.setText(String.valueOf(activity.datas.getTemperature()));
+            hum.setText(String.valueOf(activity.datas.getHumidity()));
+            smell.setText(String.valueOf(activity.datas.getSmell()));
 
-                            usernameText.setText(String.valueOf(activity.userName+"님의 빨래통 상태"));
-                            weight1.setText(String.valueOf(activity.weight1));
-                            weight2.setText(String.valueOf(activity.weight2));
-                            temp.setText(String.valueOf(activity.temp));
-                            hum.setText(String.valueOf(activity.hum));
-                            smell.setText(String.valueOf(activity.smell));
-
-                            if(activity.vol1 <0){
-                                BinImage1.setImageResource(R.drawable.add);
-                            }
-                            else if(activity.vol1 <50){
-                                BinImage1.setImageResource(R.drawable.add);
-                                BinImage1.setBackgroundColor(Color.GREEN);
-                            }
-                            else if(activity.vol1 <80){
-                                BinImage1.setImageResource(R.drawable.add);
-                                BinImage1.setBackgroundColor(Color.YELLOW);
-                            }
-                            else{
-                                BinImage1.setImageResource(R.drawable.add);
-                                BinImage1.setBackgroundColor(Color.RED);
-                            }
-
-                            if(activity.vol2 <0){
-                                BinImage2.setImageResource(R.drawable.add);
-                            }
-                            else if(activity.vol2 <50){
-                                BinImage2.setImageResource(R.drawable.add);
-                                BinImage2.setBackgroundColor(Color.GREEN);
-                            }
-                            else if(activity.vol2 <80){
-                                BinImage2.setImageResource(R.drawable.add);
-                                BinImage2.setBackgroundColor(Color.YELLOW);
-                            }
-                            else{
-                                BinImage2.setImageResource(R.drawable.add);
-                                BinImage2.setBackgroundColor(Color.RED);
-                            }
-
-
-                        } else {
-                            // 데이터베이스에 회원정보 없으면 블루투스 프레그먼트 전환
-                            Log.d(TAG, "No such document");
-
-                            getActivity().getSupportFragmentManager()
-                                    .popBackStack("home", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-                            getActivity().getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .replace(R.id.main_ly, new BluetoothFragment(),"bluetooth")
-                                    .setReorderingAllowed(true)
-                                    .addToBackStack("bluetoothFM")
-                                    .commit();
-                        }
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
+            if (activity.vol1 < 0) {
+                BinImage1.setImageResource(R.drawable.add);
+            } else if (activity.vol1 < 50) {
+                BinImage1.setImageResource(R.drawable.add);
+                BinImage1.setBackgroundColor(Color.GREEN);
+            } else if (activity.vol1 < 80) {
+                BinImage1.setImageResource(R.drawable.add);
+                BinImage1.setBackgroundColor(Color.YELLOW);
+            } else {
+                BinImage1.setImageResource(R.drawable.add);
+                BinImage1.setBackgroundColor(Color.RED);
             }
-        });
+
+            if (activity.vol2 < 0) {
+                BinImage2.setImageResource(R.drawable.add);
+            } else if (activity.vol2 < 50) {
+                BinImage2.setImageResource(R.drawable.add);
+                BinImage2.setBackgroundColor(Color.GREEN);
+            } else if (activity.vol2 < 80) {
+                BinImage2.setImageResource(R.drawable.add);
+                BinImage2.setBackgroundColor(Color.YELLOW);
+            } else {
+                BinImage2.setImageResource(R.drawable.add);
+                BinImage2.setBackgroundColor(Color.RED);
+            }
+
+        }
+
+
     }
 
     @Override
@@ -182,15 +133,12 @@ public class HomeFragment extends Fragment {
         goToBlueTooth = rootview.findViewById(R.id.goTOBluetooth);
         logOut = rootview.findViewById(R.id.logOut);
 
-// 여기에 동작부분 넣기
-        mAuth = FirebaseAuth.getInstance();
-
         init();
 
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.sendData("재측정 신호!!!!!!!!!!!!!");
+                // activity.sendData("재측정 신호!!!!!!!!!!!!!");
                 init();
             }
         });

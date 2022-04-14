@@ -5,48 +5,72 @@ public class UserInfo {
 
     private String name;
     private String phoneNum;
-    private String address;
-    private String birth;
+    private String location;
+    private String detegentType;
+    private int laundryVol;
+    private String userId;
 
-    // 추가적으로 빨래통 1, 빨래통 2, 세제 정보, 지역정보 선언해주기
+    public boolean isnull;
 
-    public UserInfo(String name, String phoneNum, String address, String birth){
+    public UserInfo() {
+        isnull = true;
+    }
+
+    public UserInfo(String location, String detegentType, int laundryVol, String name, String phoneNum, String userId) {
         this.name = name;
-        this.address = address;
         this.phoneNum = phoneNum;
-        this.birth = birth;
+        this.location = location;
+        this.detegentType = detegentType;
+        this.laundryVol = laundryVol;
+        this.userId = userId;
+        isnull = false;
     }
 
-    public String getName(){
-        return this.name;
+    public String getName() {
+        return name;
     }
-    public void setName(String name){
+
+    public void setName(String name) {
         this.name = name;
     }
 
-
-    public String getAddress(){
-        return  this.address;
-    }
-    public void setAddress(String address){
-        this.address = address;
+    public String getPhoneNum() {
+        return phoneNum;
     }
 
-
-    public String getPhoneNum(){
-        return  this.phoneNum;
-    }
-    public void setPhoneNum(String phoneNum){
+    public void setPhoneNum(String phoneNum) {
         this.phoneNum = phoneNum;
     }
 
-
-    public String getBirth(){
-        return  this.birth;
-    }
-    public void setBirth(String birth){
-        this.birth = birth;
+    public String getLocation() {
+        return location;
     }
 
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
+    public String getDetegentType() {
+        return this.detegentType;
+    }
+
+    public void setDetegentType(String detergentType) {
+        this.detegentType = detergentType;
+    }
+
+    public int getLaundryVol() {
+        return this.laundryVol;
+    }
+
+    public void setLaundryVol(int laundryVol) {
+        this.laundryVol = laundryVol;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 }
