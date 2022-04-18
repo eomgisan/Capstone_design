@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import com.example.ex1.dataStructure.Datas;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     Fragment settingFM = new SettingFragement();
     Fragment recommandFM = new RecommandFragment();
     Fragment featureFM = new FeatureFragment();
+    Fragment communityFM = new CommunityFragment();
     Fragment bluetoothFM = new BluetoothFragment();
 
     // 블루투스
@@ -92,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
     Weather7 weather7;
     HashSet<CalendarDay> RecommandDates;
     boolean apiFinish = false;
+
+    WebView webView;
 
 
 
@@ -227,6 +231,16 @@ public class MainActivity extends AppCompatActivity {
 
 
                     Log.d(TAG, "onNavigationItemSelected: community button clicked");
+
+                    getSupportFragmentManager().popBackStack("community", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_ly, communityFM,"community")
+                            .setReorderingAllowed(true)
+                            .addToBackStack("communityFM")
+                            .commitAllowingStateLoss();
+                    Log.d(TAG,communityFM.getTag());
+
                     return true;
 
 
@@ -324,8 +338,11 @@ public class MainActivity extends AppCompatActivity {
         else if (tag.equals("setting") ){
             bottomNavigationView.getMenu().findItem(R.id.menu_setting).setChecked(true);
         }
-        else{
-            //
+        else if (tag.equals("community")){
+            bottomNavigationView.getMenu().findItem(R.id.menu_community).setChecked(true);
+        }
+        else if (tag.equals("feature")){
+            bottomNavigationView.getMenu().findItem(R.id.menu_feature).setChecked(true);
         }
     }
 
@@ -467,30 +484,33 @@ public class MainActivity extends AppCompatActivity {
     long pressedTime = 0; //'뒤로가기' 버튼 클릭했을 때의 시간
     @Override
     public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount() == 1){
-            //마지막으로 누른 '뒤로가기' 버튼 클릭 시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 크면
-            if(System.currentTimeMillis() > pressedTime + 2000){
-                //현재 시간을 pressedTime 에 저장
-                pressedTime = System.currentTimeMillis();
-                Toast.makeText(getApplicationContext(),"한번 더 누르면 종료", Toast.LENGTH_SHORT).show();
-            }
-
-            //마지막 '뒤로가기' 버튼 클릭시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 작으면
-            else{
-                Toast.makeText(getApplicationContext(),"종료 완료", Toast.LENGTH_SHORT).show();
-                // 앱 종료
-                moveTaskToBack(true); // 태스크를 백그라운드로 이동
-                finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
-
-                System.exit(0);
-            }
+        if (webView != null && webView.canGoBack()) {
+            webView.goBack();
         }
         else{
-            super.onBackPressed();
-            updateBottomBar();
-        };
+            if(getSupportFragmentManager().getBackStackEntryCount() == 1){
+                //마지막으로 누른 '뒤로가기' 버튼 클릭 시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 크면
+                if(System.currentTimeMillis() > pressedTime + 2000){
+                    //현재 시간을 pressedTime 에 저장
+                    pressedTime = System.currentTimeMillis();
+                    Toast.makeText(getApplicationContext(),"한번 더 누르면 종료", Toast.LENGTH_SHORT).show();
+                }
 
+                //마지막 '뒤로가기' 버튼 클릭시간이 이전의 '뒤로가기' 버튼 클릭 시간과의 차이가 2초보다 작으면
+                else{
+                    Toast.makeText(getApplicationContext(),"종료 완료", Toast.LENGTH_SHORT).show();
+                    // 앱 종료
+                    moveTaskToBack(true); // 태스크를 백그라운드로 이동
+                    finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
 
+                    System.exit(0);
+                }
+            }
+            else{
+                super.onBackPressed();
+                updateBottomBar();
+            };
+        }
     }
 
 

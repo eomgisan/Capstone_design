@@ -38,6 +38,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
+        android:background="#D1C4E9"
         android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="18dp"
@@ -61,14 +62,17 @@
         app:layout_constraintTop_toBottomOf="@+id/diaryTextView" />
 
     <TextView
+        android:id="@+id/textView2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:id="@+id/textView2"
-        app:layout_constraintTop_toTopOf="@+id/contextEditText"
-        app:layout_constraintBottom_toBottomOf="@+id/contextEditText" app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
-        app:layout_constraintStart_toStartOf="@+id/contextEditText" android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp" android:visibility="invisible"/>
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="#FFFFFF"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/contextEditText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/contextEditText"
+        app:layout_constraintTop_toTopOf="@+id/contextEditText" />
 
     <TextView
         android:id="@+id/textView3"
@@ -77,10 +81,11 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:background="#D1C4E9"
         android:gravity="center"
         android:text="월간 계획표"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="#9E28B3"
+        android:textColor="#000000"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

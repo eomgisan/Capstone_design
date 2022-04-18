@@ -11,46 +11,173 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:background="@color/white"
+        android:background="@color/purple_200"
+        android:backgroundTint="#D1C4E9"
         android:gravity="center"
-        android:text="사용자 빨래 주기"
+        android:text="최근 7일 일일 빨래 증가량"
         android:textColor="#000000"
         android:textSize="20sp"
         android:textStyle="bold" />
 
 
-    <TextView
-        android:id="@+id/priodText"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="빨래 주기가 아직 분석이 안되었습니다."
-        android:layout_margin="5dp"/>
+        android:layout_height="250dp"
+        android:orientation="horizontal">
 
+        <LinearLayout
+            android:layout_width="299dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/incChart1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:backgroundTint="#D1C4E9"
+                android:gravity="center"
+                android:text="일일 평균 증가량 [빨래통1]"
+                android:textColor="#000000"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/averInc1"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:gravity="center"
+                android:text="데이터없음"
+                android:textColor="#000000"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_margin="5dp"
+                android:background="#D1C4E9"
+                android:gravity="center"
+                android:text="일일 평균 증가량 [빨래통2]"
+                android:textColor="#000000"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/averInc2"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:gravity="center"
+                android:text="데이터없음"
+                android:textColor="#000000"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
 
 
     <TextView
+        android:id="@+id/textView8"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:background="@color/white"
+        android:background="@color/purple_200"
+        android:backgroundTint="#D1C4E9"
         android:gravity="center"
-        android:text="방안 평균 온습도"
+        android:text="최근 5회간 기록된 세탁주기"
         android:textColor="#000000"
         android:textSize="20sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/averTempHumi"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="방안 평균 온습도가 아직 파악이 안되었습니다."
-        android:layout_margin="5dp"/>
+        android:layout_height="250dp"
+        android:orientation="horizontal">
 
+        <LinearLayout
+            android:layout_width="299dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/periodChart1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
+        </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:backgroundTint="#D1C4E9"
+                android:gravity="center"
+                android:text="평균 세탁 주기 [빨래통1]"
+                android:textColor="#000000"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/averPeriod1"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:gravity="center"
+                android:text="데이터없음"
+                android:textColor="#000000"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:backgroundTint="#D1C4E9"
+                android:gravity="center"
+                android:text="평균 세탁 주기 [빨래통2]"
+                android:textColor="#000000"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/averPeriod2"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:gravity="center"
+                android:text="데이터없음"
+                android:textColor="#000000"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
 
 
 </LinearLayout>
