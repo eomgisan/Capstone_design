@@ -221,7 +221,7 @@ public class RecommandFragment extends Fragment {
         );
 
         if(activity.apiFinish == true){
-            calendarView.addDecorator(new MainDecorator(eventList));
+            calendarView.addDecorator(new MainDecorator(activity.RecommandDates));
         }
 
 

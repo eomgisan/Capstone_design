@@ -140,6 +140,8 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 // activity.sendData("재측정 신호!!!!!!!!!!!!!");
                 init();
+                activity.RecommandDates = activity.weather();
+                activity.startToast("데이터베이스 새로고침 완료");
             }
         });
 

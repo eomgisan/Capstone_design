@@ -1,5 +1,7 @@
 package com.example.ex1.weather;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,35 +21,37 @@ public class Weather7 {
     private String[] WFAM = new String[8];
     private String[] WFPM = new String[8];
 
+    public boolean isnull = true;
+
     public Weather7() {
     }
 
-    public String[] getTEMMAX() {
-        return TEMMAX;
+    public String getTEMMAX(int i) {
+        return TEMMAX[i];
     }
 
     public void setTEMMAX(String TEMMAX, int i) {
         this.TEMMAX[i] = TEMMAX;
     }
 
-    public String[] getTEMMIN() {
-        return TEMMIN;
+    public String getTEMMIN(int i) {
+        return TEMMIN[i];
     }
 
     public void setTEMMIN(String TEMMIN, int i) {
         this.TEMMIN[i] = TEMMIN;
     }
 
-    public String[] getRNAM() {
-        return RNAM;
+    public String getRNAM(int i) {
+        return RNAM[i];
     }
 
     public void setRNAM(String RNAM, int i) {
         this.RNAM[i] = RNAM;
     }
 
-    public String[] getRNPM() {
-        return RNPM;
+    public String getRNPM(int i) {
+        return RNPM[i];
     }
 
     public void setRNPM(String RNPM, int i) {
@@ -55,16 +59,16 @@ public class Weather7 {
     }
 
 
-    public String[] getWFAM() {
-        return WFAM;
+    public String getWFAM(int i) {
+        return WFAM[i];
     }
 
     public void setWFAM(String WFAM, int i) {
         this.WFAM[i] = WFAM;
     }
 
-    public String[] getWFPM() {
-        return WFPM;
+    public String getWFPM(int i) {
+        return WFPM[i];
     }
 
     public void setWFPM(String WFPM, int i) {
@@ -308,6 +312,8 @@ public class Weather7 {
 
         lookUpWeather_tmp(LocationCode, date);
         lookUpWeather_sky(LocationCode, date);
+        Log.d("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ","weather7 끝");
+        isnull = false;
     }
 
 }

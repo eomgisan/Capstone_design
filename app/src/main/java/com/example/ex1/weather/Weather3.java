@@ -1,5 +1,7 @@
 package com.example.ex1.weather;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,67 +22,60 @@ public class Weather3 {
 
     private String[] SKY = new String[3];
 
-    private String[] TMN = new String[3];
-
-    private String[] TMX = new String[3];
+    private String[] TMP = new String[3];
 
     private String[] WSD = new String[3];
+
+    public boolean isnull = true;
 
 
     public Weather3() {
 
     }
 
-    public String[] getPOP() {
-        return POP;
+    public String getPOP(int i) {
+        return POP[i];
     }
 
     public void setPOP(String POP,int i) {
         this.POP[i] = POP;
     }
 
-    public String[] getPTY() {
-        return PTY;
+    public String getPTY(int i) {
+        return PTY[i];
     }
 
     public void setPTY(String PTY, int i) {
         this.PTY[i] = PTY;
     }
 
-    public String[] getREH() {
-        return REH;
+    public String getREH(int i) {
+        return REH[i];
     }
 
     public void setREH(String REH , int i) {
         this.REH[i] = REH;
     }
 
-    public String[] getSKY() {
-        return SKY;
+    public String getSKY(int i) {
+        return SKY[i];
     }
 
     public void setSKY(String SKY, int i) {
         this.SKY[i] = SKY;
     }
 
-    public String[] getTMN() {
-        return TMN;
+    public String getTMP(int i) {
+        return TMP[i];
     }
 
-    public void setTMN(String TMN, int i) {
-        this.TMN[i] = TMN;
+    public void setTMP(String TMP, int i) {
+        this.TMP[i] = TMP;
     }
 
-    public String[] getTMX() {
-        return TMX;
-    }
 
-    public void setTMX(String TMX, int i) {
-        this.TMX[i] = TMX;
-    }
-
-    public String[] getWSD() {
-        return WSD;
+    public String getWSD(int i) {
+        return WSD[i];
     }
 
     public void setWSD(String WSD, int i) {
@@ -176,7 +171,7 @@ public class Weather3 {
         String result= sb.toString();
 
         //=======이 밑에 부터는 json에서 데이터 파싱해 오는 부분이다=====//
-
+        Log.d("zzzzzzzzzz",result);
         // response 키를 가지고 데이터를 파싱
         JSONObject jsonObj_1 = new JSONObject(result);
         String response = jsonObj_1.getString("response");
@@ -209,30 +204,33 @@ public class Weather3 {
                 if(category.equals("POP")){
                     // 강수확률 %값
                     this.setPOP(fcstValue,0);
+                    Log.d("zzzzz","weather3 POP :" + this.POP[0]);
                 }
                 else if(category.equals("PTY")){
                     // 강수형태 코드값 ( 0 = 없음, 1 = 비, 2 = 비/눈, 3 = 눈 4 = 소나기 )
                     this.setPTY(fcstValue,0);
+                    Log.d("zzzzz","weather3 PTY " + i + " : " + fcstValue);
                 }
                 else if(category.equals("REH")){
                     // 습도 %값
                     this.setREH(fcstValue,0);
+                    Log.d("zzzzz","weather3 REH " + i + " : " + fcstValue);
                 }
                 else if(category.equals("SKY")){
                     // 날씨 코드값   ( 1 = 맑음, 3 = 구름많음, 4 = 흐림 )
                     this.setSKY(fcstValue,0);
+                    Log.d("zzzzz","weather3 SKY " + i + " : " + fcstValue);
                 }
-                else if(category.equals("TMN")){
+                else if(category.equals("TMP")){
                     // 일 최저기온 C값
-                    this.setTMN(fcstValue,0);
+                    this.setTMP(fcstValue,0);
+                    Log.d("zzzzz","weather3 TMP " + i + " : " + fcstValue);
                 }
-                else if(category.equals("TMX")){
-                    // 일 최고기온 C값
-                    this.setTMX(fcstValue,0);
-                }
+
                 else if(category.equals("WSD")){
                     // 풍속 m/s값 ( 4미만 = 약한바람, 4~9 = 나뭇잎 흔들림, 9~14 = 나뭇가지 흔들림, 14~ = 바람 매우 강함 )
                     this.setWSD(fcstValue,0);
+                    Log.d("zzzzz","weather3 WSD " + i + " : " + fcstValue);
                 }
             }
 
@@ -255,14 +253,11 @@ public class Weather3 {
                     // 날씨 코드값   ( 1 = 맑음, 3 = 구름많음, 4 = 흐림 )
                     this.setSKY(fcstValue,1);
                 }
-                else if(category.equals("TMN")){
+                else if(category.equals("TMP")){
                     // 일 최저기온 C값
-                    this.setTMN(fcstValue,1);
+                    this.setTMP(fcstValue,1);
                 }
-                else if(category.equals("TMX")){
-                    // 일 최고기온 C값
-                    this.setTMX(fcstValue,1);
-                }
+
                 else if(category.equals("WSD")){
                     // 풍속 m/s값 ( 4미만 = 약한바람, 4~9 = 나뭇잎 흔들림, 9~14 = 나뭇가지 흔들림, 14~ = 바람 매우 강함 )
                     this.setWSD(fcstValue,1);
@@ -288,14 +283,11 @@ public class Weather3 {
                     // 날씨 코드값   ( 1 = 맑음, 3 = 구름많음, 4 = 흐림 )
                     this.setSKY(fcstValue,2);
                 }
-                else if(category.equals("TMN")){
+                else if(category.equals("TMP")){
                     // 일 최저기온 C값
-                    this.setTMN(fcstValue,2);
+                    this.setTMP(fcstValue,2);
                 }
-                else if(category.equals("TMX")){
-                    // 일 최고기온 C값
-                    this.setTMX(fcstValue,2);
-                }
+
                 else if(category.equals("WSD")){
                     // 풍속 m/s값 ( 4미만 = 약한바람, 4~9 = 나뭇잎 흔들림, 9~14 = 나뭇가지 흔들림, 14~ = 바람 매우 강함 )
                     this.setWSD(fcstValue,2);
@@ -304,6 +296,9 @@ public class Weather3 {
 
 
         }
+        Log.d("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ","weather3 끝");
+        isnull = false;
+        Log.d("zzzzzzzzzzzz",this.getPOP(0));
 
     }
 

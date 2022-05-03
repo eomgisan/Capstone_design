@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 
+import com.example.ex1.dataStructure.Datas;
+import com.example.ex1.dataStructure.UserFeature;
 import com.example.ex1.dataStructure.UserInfo;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,6 +28,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 
 public class UserInfoFragment extends Fragment {
@@ -73,6 +76,93 @@ public class UserInfoFragment extends Fragment {
         DocumentReference docRef = activity.db.collection("datas").document(user.getUid()).collection("userInfo").document("userInfo");
         UserInfo userInfo = new UserInfo(location,detergentType,laundryVol,name,phoneNum, activity.userId);
         docRef.set(userInfo)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        activity.startToast(e.toString());
+                    }
+                });
+
+        docRef = activity.db.collection("datas").document(user.getUid()).collection("userInfo").document("userFeature");
+        UserFeature userFeature = new UserFeature(7.0,7.0,1.0,1.0,7.0,7.0, CalendarDay.today().toString(),CalendarDay.today().toString());
+        docRef.set(userFeature)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        activity.startToast(e.toString());
+                    }
+                });
+        docRef = activity.db.collection("datas").document(user.getUid()).collection("featureAnalysis").document("period1");
+        docRef.set(null)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        activity.startToast(e.toString());
+                    }
+                });
+
+        docRef = activity.db.collection("datas").document(user.getUid()).collection("featureAnalysis").document("period2");
+        docRef.set(null)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        activity.startToast(e.toString());
+                    }
+                });
+        docRef = activity.db.collection("datas").document(user.getUid()).collection("featureAnalysis").document("preweight1");
+        docRef.set(null)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        activity.startToast(e.toString());
+                    }
+                });
+        docRef = activity.db.collection("datas").document(user.getUid()).collection("featureAnalysis").document("weight_increment1");
+        docRef.set(null)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        activity.startToast(e.toString());
+                    }
+                });
+        docRef = activity.db.collection("datas").document(user.getUid()).collection("featureAnalysis").document("weight_increment2");
+        docRef.set(null)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

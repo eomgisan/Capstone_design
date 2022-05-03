@@ -167,56 +167,63 @@ public class SettingFragement extends Fragment {
 
 
                 // db저장
-                activity.userInfo.setLaundryVol(volume_set);
+                if(volume_set <= 10){
+                    activity.userInfo.setLaundryVol(volume_set);
 
-                if (pongpong_set == 0) {
-                    activity.userInfo.setDetegentType("고체세제");
-                } else {
-                    activity.userInfo.setDetegentType("액체세제");
+
+                    if (pongpong_set == 0) {
+                        activity.userInfo.setDetegentType("고체세제");
+                    } else {
+                        activity.userInfo.setDetegentType("액체세제");
+                    }
+
+                    switch (location_set) {
+                        case 0:
+                            activity.userInfo.setLocation("서울");
+                        case 1:
+                            activity.userInfo.setLocation("인천");
+                        case 2:
+                            activity.userInfo.setLocation("경기도");
+                        case 3:
+                            activity.userInfo.setLocation("강원도");
+                        case 4:
+                            activity.userInfo.setLocation("충청북도");
+                        case 5:
+                            activity.userInfo.setLocation("충청남도");
+                        case 6:
+                            activity.userInfo.setLocation("전라북도");
+                        case 7:
+                            activity.userInfo.setLocation("전라남도");
+                        case 8:
+                            activity.userInfo.setLocation("경상북도");
+                        case 9:
+                            activity.userInfo.setLocation("경상남도");
+                        case 10:
+                            activity.userInfo.setLocation("제주도");
+                    }
+
+                    db.collection("datas").document(user.getUid())
+                            .collection("userinfo").document("userInfo").set(activity.userInfo)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    activity.startToast("개인 설정 정보 저장 완료");
+                                    activity.bottomNavigationView.getMenu().findItem(R.id.menu_home).setChecked(true);
+                                    activity.updateBottomBar();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    activity.startToast("개인 설정 정보 저장 실패");
+                                    Log.e(TAG, e.toString());
+                                }
+                            });
+                }
+                else{
+                    activity.startToast("세탁기 용량은 최대 10kg 입니다!");
                 }
 
-                switch (location_set) {
-                    case 0:
-                        activity.userInfo.setLocation("서울");
-                    case 1:
-                        activity.userInfo.setLocation("인천");
-                    case 2:
-                        activity.userInfo.setLocation("경기도");
-                    case 3:
-                        activity.userInfo.setLocation("강원도");
-                    case 4:
-                        activity.userInfo.setLocation("충청북도");
-                    case 5:
-                        activity.userInfo.setLocation("충청남도");
-                    case 6:
-                        activity.userInfo.setLocation("전라북도");
-                    case 7:
-                        activity.userInfo.setLocation("전라남도");
-                    case 8:
-                        activity.userInfo.setLocation("경상북도");
-                    case 9:
-                        activity.userInfo.setLocation("경상남도");
-                    case 10:
-                        activity.userInfo.setLocation("제주도");
-                }
-
-                db.collection("datas").document(user.getUid())
-                        .collection("userinfo").document("userInfo").set(activity.userInfo)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                activity.startToast("개인 설정 정보 저장 완료");
-                                activity.bottomNavigationView.getMenu().findItem(R.id.menu_home).setChecked(true);
-                                activity.updateBottomBar();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                activity.startToast("개인 설정 정보 저장 실패");
-                                Log.e(TAG, e.toString());
-                            }
-                        });
             }
         });
         return rootview;

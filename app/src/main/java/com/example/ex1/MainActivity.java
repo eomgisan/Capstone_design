@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -90,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
     UserFeature userFeature = new UserFeature();
 
 
-    Weather3 weather3;
-    Weather7 weather7;
+    Weather3 weather3 = new Weather3();
+    Weather7 weather7 = new Weather7();
     HashSet<CalendarDay> RecommandDates;
     boolean apiFinish = false;
 
@@ -151,9 +152,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        Weather3 weather3 = new Weather3();
-        Weather7 weather7 = new Weather7();
-
 
 
         // xml 설정
@@ -169,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 try{
                     long mNow;
                     Date mDate;
-
+                    Log.d("zzzzzzzzzzzzz","zzzzzzzzzzz");
                     int date;
                     int Time;
 
@@ -180,15 +178,24 @@ public class MainActivity extends AppCompatActivity {
 
                     date = Integer.valueOf(mFormat1.format(mDate)).intValue();
                     Time = Integer.valueOf(mFormat2.format(mDate)).intValue();
-
+                    Log.d("zzzzzzzzzzzzz","zzzzzzzzzzz");
                     weather3.lookUpWeather(0,date, Time);
                     weather7.lookUpWeather(0,date, Time);
-
-                    apiFinish = true;
 
                     // 여기에 그거 조정해서 그거 그거하기
                     // 추가 하는 방법 = RecommandDates.add(CalendarDay.from(year,month,day));
 
+                    while(true){
+                        if(weather3.isnull || weather7.isnull || datas.isnull){
+
+                        }
+                        else{
+                            RecommandDates = weather();
+                            apiFinish = true;
+                            Log.d("zzzzzzzzzzzzzzzzzzzzz","빨래날짜 추천 계산 완료");
+                            break;
+                        }
+                    }
                 }
                 catch (IOException e){
                     e.printStackTrace();
@@ -205,6 +212,141 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(onItemSelectedListener);
         bottomNavigationView.setSelectedItemId(R.id.menu_home);
+    }
+
+    public HashSet<CalendarDay> weather(){
+        double averInc1 = userFeature.getAver_inc1();
+        double averInc2 = userFeature.getAver_inc2();
+
+        HashSet<CalendarDay> recommand = new HashSet<CalendarDay>();
+
+        CalendarDay[] result = new CalendarDay[2];
+        result[0] = CalendarDay.today();
+        result[1] = CalendarDay.today();
+
+        Log.d("지금", result[0].toString());
+        Log.d("지금",result[1].toString());
+
+
+        if(datas.getSmell() >10){
+            // 오늘 추천후 알아서 빨래하쎔 ㄱㄱ
+            recommand.add(result[0]);
+            recommand.add(result[1]);
+            return recommand;
+        }
+        else{
+
+            double dayafter1 = (userFeature.getIdeal_w1() - datas.getWeight1()) / averInc1;
+            double dayafter2 = (userFeature.getIdeal_w2() - datas.getWeight2()) / averInc2;
+            Log.d("지금ㅋㅋㅋ", dayafter1+"");
+            Log.d("지금ㅋㅋㅋ", dayafter2+"");
+            double[] score1 = new double[11];
+            double[] score2 = new double[11];
+
+
+            int i = 0;
+            for(i=0;i<11;i++){
+                if(i<dayafter1){
+                    score1[i] = (100/dayafter1)*(i+1);
+                }
+                else{
+                    score1[i] = 180 - (100/dayafter1)*(i+1);
+                }
+
+            }
+            for(i=0;i<11;i++){
+                if(i<dayafter2){
+                    score2[i] = (100/dayafter2)*(i+1);
+                }
+                else{
+                    score1[i] = 180 - (100/dayafter2)*(i+1);
+                }
+            }
+
+            if (datas.getWeight1() > 10){
+                score1[0] += 1500;
+            }
+            if (datas.getWeight2() > 10){
+                // 2번 빨래통 오늘 추천
+                score2[0] += 1500;
+            }
+
+
+                for(i=0;i<3;i++) {
+                    Log.d("zzz",i+"" + weather3.getPOP(i));
+                    score1[i] -= Double.parseDouble(weather3.getPOP(i));
+                    score2[i] -= Double.parseDouble(weather3.getPOP(i));
+
+
+                    if(weather3.getPTY(i) != "0"){
+                        score1[i] += 50;
+                        score2[i] += 50;
+                    }
+
+                    if(weather3.getPTY(i) != "1"){
+                        score1[i] -= 30;
+                        score2[i] -= 30;
+                    }
+
+                    if(weather3.getPTY(i) != "2"){
+                        score1[i] -= 40;
+                        score2[i] -= 40;
+                    }
+
+                    if(weather3.getPTY(i) != "3"){
+                        score1[i] -= 50;
+                        score2[i] -= 50;
+                    }
+                    if(weather3.getPTY(i) != "4"){
+                        score1[i] -= 20;
+                        score2[i] -= 20;
+                    }
+
+                    score1[i] += Double.parseDouble(weather3.getTMP(i));
+                    score2[i] += Double.parseDouble(weather3.getTMP(i));
+
+                }
+                for(i=3;i<11;i++){
+                    score1[i] -= Double.parseDouble(weather7.getRNAM(i-3))/2;
+                    score1[i] -= Double.parseDouble(weather7.getRNPM(i-3))/2;
+                    score2[i] -= Double.parseDouble(weather7.getRNAM(i-3))/2;
+                    score2[i] -= Double.parseDouble(weather7.getRNPM(i-3))/2;
+
+                    if(weather7.getWFAM(i-3) == "d" || weather7.getWFPM(i-3) == "d"){
+                        score1[i] -= 100;
+                        score2[i] -= 100;
+                        // 문자열 탐색 기능 넣어서 비 있으면 감소하는 형식으로
+                    }
+                }
+                int max1 = 0;
+                int max2 = 0;
+                for(i=1;i<11;i++){
+                    if(score1[max1]<score1[i]){
+                        max1 = i;
+                    }
+                    if(score2[max2]<score2[i]){
+                        max2 = i;
+                    }
+                }
+                for(i=0;i<11;i++){
+                    Log.d(TAG + "zzzzzzzzzzzzzzzzzzzzzzzz",score1[i]+"");
+                    Log.d(TAG + "zzzzzzzzzzzzzzzzzzzzzzzz",score2[i]+"");
+
+                }
+
+                result[0] = CalendarDay.from(result[0].getYear(),result[0].getMonth(),result[0].getDay()+max1);
+                result[1] = CalendarDay.from(result[1].getYear(),result[1].getMonth(),result[1].getDay()+max2);
+
+                Log.d("지금", result[0].toString());
+                Log.d("지금",result[1].toString());
+
+
+                recommand.add(result[0]);
+                recommand.add(result[1]);
+
+
+            return recommand;
+        }
     }
 
 
@@ -452,11 +594,12 @@ public class MainActivity extends AppCompatActivity {
                             Double priod2 = Double.valueOf(document.getData().get("averDay2").toString());
                             Double averinc1 = Double.valueOf(document.getData().get("averIncWeight1").toString());
                             Double averinc2 = Double.valueOf(document.getData().get("averIncWeight2").toString());
-
+                            Double ideal_w1 = Double.valueOf(document.getData().get("ideal_w1").toString());
+                            Double ideal_w2 = Double.valueOf(document.getData().get("ideal_w2").toString());
                             String recommand1 = document.getData().get("recommand1").toString();
                             String recommand2 = document.getData().get("recommand2").toString();
 
-                            userFeature = new UserFeature(averinc1,averinc2,priod1,priod2,recommand1,recommand2);
+                            userFeature = new UserFeature(averinc1,averinc2,priod1,priod2,ideal_w1,ideal_w2,recommand1,recommand2);
                         }
                         else{
                             Log.d(TAG, "아직 사용자 주기 파악이 안되었습니다.");

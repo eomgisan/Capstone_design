@@ -70,7 +70,7 @@ public class SignUpFragment extends Fragment {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                         try{
-                            document.getData().get(UserId);
+                            Log.d("zzzzzz",document.getData().get(UserId).toString());
                             activity.startToast("아이디가 중복되었습니다. 다시입력해주세요");
                         }
                         catch(Exception e){
