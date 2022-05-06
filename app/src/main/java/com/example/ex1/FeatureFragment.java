@@ -137,7 +137,7 @@ public class FeatureFragment extends Fragment {
                                     long day = (date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24);
 
                                     entries.add(new BarEntry(i+1,day));
-                                    Log.d("지금",i +" p1 "+ day +"");
+
                                 }catch(Exception e){
                                     Log.d("지금",keyList.get(i));
                                     Log.d("지금",keyList.get(i+1));
@@ -212,7 +212,7 @@ public class FeatureFragment extends Fragment {
                                     long day = (date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24);
 
                                     entries.add(new BarEntry(i+1,day));
-                                    Log.d("지금",i +" p2 "+ day +"");
+
                                 }catch(Exception e){
                                     Log.d("지금",keyList.get(i));
                                     Log.d("지금",keyList.get(i+1));
@@ -336,7 +336,7 @@ public class FeatureFragment extends Fragment {
                                 float now = Float.valueOf(keyList.get(i));
                                 float weight = Float.valueOf(String.valueOf(map.get(keyList.get(i))));
                                 entries.add(new BarEntry(i, weight));
-                                Log.d("지금",now +" w2 "+ weight +"");
+
                             }
                             BarDataSet barDataSetW1 = new BarDataSet(entries, "2번빨래통");
                             barDataSetW1.setColor(Color.BLUE);

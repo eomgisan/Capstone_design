@@ -93,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
 
     Weather3 weather3 = new Weather3();
     Weather7 weather7 = new Weather7();
-    HashSet<CalendarDay> RecommandDates;
+    HashSet<CalendarDay> RecommandDates1;
+    HashSet<CalendarDay> RecommandDates2;
     boolean apiFinish = false;
 
     WebView webView;
@@ -190,7 +191,8 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                         else{
-                            RecommandDates = weather();
+                            RecommandDates1 = weather(datas.getWeight1(),userFeature.getIdeal_w1(),userFeature.getAver_inc1());
+                            RecommandDates2 = weather(datas.getWeight2(),userFeature.getIdeal_w2(),userFeature.getAver_inc2());
                             apiFinish = true;
                             Log.d("zzzzzzzzzzzzzzzzzzzzz","빨래날짜 추천 계산 완료");
                             break;
@@ -214,140 +216,100 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.menu_home);
     }
 
-    public HashSet<CalendarDay> weather(){
-        double averInc1 = userFeature.getAver_inc1();
-        double averInc2 = userFeature.getAver_inc2();
+    public HashSet<CalendarDay> weather(double weight, double ideal_w, double averInc){
 
         HashSet<CalendarDay> recommand = new HashSet<CalendarDay>();
 
-        CalendarDay[] result = new CalendarDay[2];
-        result[0] = CalendarDay.today();
-        result[1] = CalendarDay.today();
-
-        Log.d("지금", result[0].toString());
-        Log.d("지금",result[1].toString());
+        CalendarDay result = CalendarDay.today();
 
 
-        if(datas.getSmell() >10){
+        if(datas.getSmell() >10 || weight > 10){
             // 오늘 추천후 알아서 빨래하쎔 ㄱㄱ
-            recommand.add(result[0]);
-            recommand.add(result[1]);
+            recommand.add(result);
+
             return recommand;
         }
         else{
 
-            double dayafter1 = (userFeature.getIdeal_w1() - datas.getWeight1()) / averInc1;
-            double dayafter2 = (userFeature.getIdeal_w2() - datas.getWeight2()) / averInc2;
-            Log.d("지금ㅋㅋㅋ", dayafter1+"");
-            Log.d("지금ㅋㅋㅋ", dayafter2+"");
-            double[] score1 = new double[11];
-            double[] score2 = new double[11];
+            double dayafter = (ideal_w - weight) / averInc;
+
+            double[] score = new double[11];
 
 
             int i = 0;
+
+
             for(i=0;i<11;i++){
-                if(i<dayafter1){
-                    score1[i] = (100/dayafter1)*(i+1);
+                if(i<dayafter){
+                    score[i] = (100/dayafter)*(i+1);
                 }
                 else{
-                    score1[i] = 180 - (100/dayafter1)*(i+1);
+                    score[i] = 80+(100/i-11);
+                }
+
+            }
+
+            for(i=0;i<3;i++) {
+                Log.d("zzz",i+"" + weather3.getPOP(i));
+                score[i] -= Double.parseDouble(weather3.getPOP(i));
+
+                if(weather3.getPTY(i) != "0"){
+                    score[i] += 50;
+                }
+
+                if(weather3.getPTY(i) != "1"){
+                    score[i] -= 30;
+                }
+
+                if(weather3.getPTY(i) != "2"){
+                    score[i] -= 40;
+                }
+
+                if(weather3.getPTY(i) != "3"){
+                    score[i] -= 50;
+                }
+                if(weather3.getPTY(i) != "4"){
+                    score[i] -= 20;
+                }
+                score[i] += Double.parseDouble(weather3.getTMP(i));
+
+            }
+            for(i=3;i<11;i++){
+                score[i] -= Double.parseDouble(weather7.getRNAM(i-3))/2;
+                score[i] -= Double.parseDouble(weather7.getRNPM(i-3))/2;
+
+                if(weather7.getWFAM(i-3) == "맑음" || weather7.getWFPM(i-3) == "맑음"){
+                    score[i] += 25;
+
+                }
+            }
+
+            int max = 0;
+
+            for(i=1;i<11;i++){
+                if(score[max]<score[i]){
+                    max = i;
                 }
 
             }
             for(i=0;i<11;i++){
-                if(i<dayafter2){
-                    score2[i] = (100/dayafter2)*(i+1);
-                }
-                else{
-                    score1[i] = 180 - (100/dayafter2)*(i+1);
-                }
+                Log.d(TAG + "zzzzzzzzzzzzzzzzzzzzzzzz",score[i]+"");
+
             }
 
-            if (datas.getWeight1() > 10){
-                score1[0] += 1500;
-            }
-            if (datas.getWeight2() > 10){
-                // 2번 빨래통 오늘 추천
-                score2[0] += 1500;
-            }
+            result = CalendarDay.from(result.getYear(),result.getMonth(),result.getDay()+max);
 
+            Log.d("지금", result.toString());
 
-                for(i=0;i<3;i++) {
-                    Log.d("zzz",i+"" + weather3.getPOP(i));
-                    score1[i] -= Double.parseDouble(weather3.getPOP(i));
-                    score2[i] -= Double.parseDouble(weather3.getPOP(i));
-
-
-                    if(weather3.getPTY(i) != "0"){
-                        score1[i] += 50;
-                        score2[i] += 50;
-                    }
-
-                    if(weather3.getPTY(i) != "1"){
-                        score1[i] -= 30;
-                        score2[i] -= 30;
-                    }
-
-                    if(weather3.getPTY(i) != "2"){
-                        score1[i] -= 40;
-                        score2[i] -= 40;
-                    }
-
-                    if(weather3.getPTY(i) != "3"){
-                        score1[i] -= 50;
-                        score2[i] -= 50;
-                    }
-                    if(weather3.getPTY(i) != "4"){
-                        score1[i] -= 20;
-                        score2[i] -= 20;
-                    }
-
-                    score1[i] += Double.parseDouble(weather3.getTMP(i));
-                    score2[i] += Double.parseDouble(weather3.getTMP(i));
-
-                }
-                for(i=3;i<11;i++){
-                    score1[i] -= Double.parseDouble(weather7.getRNAM(i-3))/2;
-                    score1[i] -= Double.parseDouble(weather7.getRNPM(i-3))/2;
-                    score2[i] -= Double.parseDouble(weather7.getRNAM(i-3))/2;
-                    score2[i] -= Double.parseDouble(weather7.getRNPM(i-3))/2;
-
-                    if(weather7.getWFAM(i-3) == "d" || weather7.getWFPM(i-3) == "d"){
-                        score1[i] -= 100;
-                        score2[i] -= 100;
-                        // 문자열 탐색 기능 넣어서 비 있으면 감소하는 형식으로
-                    }
-                }
-                int max1 = 0;
-                int max2 = 0;
-                for(i=1;i<11;i++){
-                    if(score1[max1]<score1[i]){
-                        max1 = i;
-                    }
-                    if(score2[max2]<score2[i]){
-                        max2 = i;
-                    }
-                }
-                for(i=0;i<11;i++){
-                    Log.d(TAG + "zzzzzzzzzzzzzzzzzzzzzzzz",score1[i]+"");
-                    Log.d(TAG + "zzzzzzzzzzzzzzzzzzzzzzzz",score2[i]+"");
-
-                }
-
-                result[0] = CalendarDay.from(result[0].getYear(),result[0].getMonth(),result[0].getDay()+max1);
-                result[1] = CalendarDay.from(result[1].getYear(),result[1].getMonth(),result[1].getDay()+max2);
-
-                Log.d("지금", result[0].toString());
-                Log.d("지금",result[1].toString());
-
-
-                recommand.add(result[0]);
-                recommand.add(result[1]);
-
+            recommand.add(result);
 
             return recommand;
         }
     }
+
+
+
+
 
 
     // 바텀 네이게이션바 선택관련 문자
@@ -541,7 +503,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     } else {
-                        Log.d(TAG, "get failed sensorData with ", task.getException());
+                        Log.d(TAG, "get failed sensorData with1 ", task.getException());
                     }
                 }
             });
@@ -549,6 +511,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             // 세팅값 가져오기
+
 
             docRef.collection("userinfo").document("userInfo")
                     .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -575,11 +538,10 @@ public class MainActivity extends AppCompatActivity {
 
 
                     } else {
-                        Log.d(TAG, "get failed userSetting with ", task.getException());
+                        Log.d(TAG, "get failed userSetting with2 ", task.getException());
                     }
                 }
             });
-
             docRef.collection("userinfo").document("userFeature")
                     .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
@@ -607,7 +569,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                     } else {
-                        Log.d(TAG, "get failed userFeature with ", task.getException());
+                        Log.d(TAG, "get failed userFeature with3 ", task.getException());
                     }
                 }
             });

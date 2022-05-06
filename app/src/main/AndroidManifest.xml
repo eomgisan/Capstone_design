@@ -25,6 +25,8 @@
 
 
 
+
+
     <application
         android:name=".Variables"
         android:allowBackup="true"

@@ -1,18 +1,20 @@
 package com.example.ex1.decorator;
 
 import android.graphics.Color;
+
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
+
 import java.util.Collection;
 import java.util.HashSet;
 
-public class MainDecorator implements DayViewDecorator {
+public class MainDecorator2 implements DayViewDecorator {
 
     private HashSet<CalendarDay> dates;
 
-    public MainDecorator(Collection<CalendarDay> date){
+    public MainDecorator2(Collection<CalendarDay> date){
         dates = new HashSet<>(date);
     }
 
@@ -25,7 +27,7 @@ public class MainDecorator implements DayViewDecorator {
     }
     @Override
     public void decorate(DayViewFacade view){
-        view.addSpan(new DotSpan(5,Color.rgb(255,0,255)));
+        view.addSpan(new DotSpan(5,Color.BLUE));
     }
 
 }

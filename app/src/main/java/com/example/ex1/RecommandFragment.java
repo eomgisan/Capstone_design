@@ -22,6 +22,8 @@ import android.widget.TextView;
 import com.example.ex1.decorator.BoldDecorator;
 import com.example.ex1.decorator.EventDecorator;
 import com.example.ex1.decorator.MainDecorator;
+import com.example.ex1.decorator.MainDecorator1;
+import com.example.ex1.decorator.MainDecorator2;
 import com.example.ex1.decorator.SaturdayDecorator;
 import com.example.ex1.decorator.SundayDecorator;
 import com.example.ex1.decorator.grayDecorator;
@@ -221,7 +223,14 @@ public class RecommandFragment extends Fragment {
         );
 
         if(activity.apiFinish == true){
-            calendarView.addDecorator(new MainDecorator(activity.RecommandDates));
+            if(activity.RecommandDates1 == activity.RecommandDates2){
+                calendarView.addDecorator(new MainDecorator(activity.RecommandDates1));
+            }
+            else{
+                calendarView.addDecorator(new MainDecorator1(activity.RecommandDates1));
+                calendarView.addDecorator(new MainDecorator2(activity.RecommandDates2));
+            }
+
         }
 
 

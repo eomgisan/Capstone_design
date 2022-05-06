@@ -83,29 +83,29 @@ public class HomeFragment extends Fragment {
             smell.setText(String.valueOf(activity.datas.getSmell()));
 
             if (activity.vol1 < 0) {
-                BinImage1.setImageResource(R.drawable.add);
+                BinImage1.setImageResource(R.drawable.bin);
             } else if (activity.vol1 < 50) {
-                BinImage1.setImageResource(R.drawable.add);
-                BinImage1.setBackgroundColor(Color.GREEN);
+                BinImage1.setImageResource(R.drawable.bin);
+                BinImage1.setColorFilter(Color.rgb(0,255,0));
             } else if (activity.vol1 < 80) {
-                BinImage1.setImageResource(R.drawable.add);
-                BinImage1.setBackgroundColor(Color.YELLOW);
+                BinImage1.setImageResource(R.drawable.bin);
+                BinImage1.setColorFilter(Color.rgb(255,255,0));;
             } else {
-                BinImage1.setImageResource(R.drawable.add);
-                BinImage1.setBackgroundColor(Color.RED);
+                BinImage1.setImageResource(R.drawable.bin);
+                BinImage1.setColorFilter(Color.rgb(255,0,0));
             }
 
             if (activity.vol2 < 0) {
-                BinImage2.setImageResource(R.drawable.add);
+                BinImage2.setImageResource(R.drawable.bin);
             } else if (activity.vol2 < 50) {
-                BinImage2.setImageResource(R.drawable.add);
-                BinImage2.setBackgroundColor(Color.GREEN);
+                BinImage2.setImageResource(R.drawable.bin);
+                BinImage2.setColorFilter(Color.rgb(0,255,0));;
             } else if (activity.vol2 < 80) {
-                BinImage2.setImageResource(R.drawable.add);
-                BinImage2.setBackgroundColor(Color.YELLOW);
+                BinImage2.setImageResource(R.drawable.bin);
+                BinImage2.setColorFilter(Color.rgb(255,255,0));;
             } else {
-                BinImage2.setImageResource(R.drawable.add);
-                BinImage2.setBackgroundColor(Color.RED);
+                BinImage2.setImageResource(R.drawable.bin);
+                BinImage2.setColorFilter(Color.rgb(255,0,0));;
             }
 
         }
@@ -140,8 +140,10 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 // activity.sendData("재측정 신호!!!!!!!!!!!!!");
                 init();
-                activity.RecommandDates = activity.weather();
+                activity.RecommandDates1 = activity.weather(activity.datas.getWeight1(),activity.userFeature.getIdeal_w1(),activity.userFeature.getAver_inc1());
+                activity.RecommandDates2 = activity.weather(activity.datas.getWeight2(),activity.userFeature.getIdeal_w2(),activity.userFeature.getAver_inc2());
                 activity.startToast("데이터베이스 새로고침 완료");
+
             }
         });
 
