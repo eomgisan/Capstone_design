@@ -123,15 +123,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        try{
-            inputStream.close();
-            outputStream.close();
-            bluetoothSocket.close();
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+
         FirebaseAuth.getInstance().signOut();
-        //unregisterReceiver(mReceiver);
         super.onDestroy();
     }
 

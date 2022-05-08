@@ -67,15 +67,7 @@ public class HomeFragment extends Fragment {
             // 데이터베이스에 센서 정보 없으면 블루투스 프레그먼트 전환
             Log.d(TAG, "No such sensorData");
 
-            getActivity().getSupportFragmentManager()
-                    .popBackStack("home", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_ly, new BluetoothFragment(), "bluetooth")
-                    .setReorderingAllowed(true)
-                    .addToBackStack("bluetoothFM")
-                    .commit();
+            startActivity(new Intent(activity, BluetoothActivity.class));
 
         } else {
 
@@ -162,15 +154,7 @@ public class HomeFragment extends Fragment {
         goToBlueTooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().getSupportFragmentManager()
-                        .popBackStack("home", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.main_ly, new BluetoothFragment(),"bluetooth")
-                        .setReorderingAllowed(true)
-                        .addToBackStack("bluetoothFM")
-                        .commit();
+                startActivity(new Intent(activity, BluetoothActivity.class));
             }
         });
 
