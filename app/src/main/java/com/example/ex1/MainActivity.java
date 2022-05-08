@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     WebView webView;
 
-    int dbState;
+
 
 
 
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         NetworkManager network = new NetworkManager(getApplicationContext());
         network.registerNetworkCallback();
 
-        dbState = 0;
+
         // Check network connection
         if (Variables.isNetworkConnected()){
             // Internet Connected
@@ -493,13 +493,13 @@ public class MainActivity extends AppCompatActivity {
                                 Double temp = Double.valueOf(document.getData().get("temp").toString());
                                 Double weight1 = Double.valueOf(document.getData().get("weight1").toString());
                                 Double weight2 = Double.valueOf(document.getData().get("weight2").toString());
-                                Log.d("TTTTTTTTTTTTTTT", datas.isnull + "?" );
+
                                 datas = new Datas(hum, smell, temp, weight1, weight2);
-                                Log.d("TTTTTTTTTTTTTTT", datas.isnull + "??" );
+
                             }
                             else{
                                 Log.d(TAG, "아직 센서값이 없습니다.", task.getException());
-                                dbState = -1;
+
 
                             }
                         }

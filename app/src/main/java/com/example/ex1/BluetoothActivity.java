@@ -80,6 +80,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+
         try{
             inputStream.close();
             outputStream.close();
@@ -96,6 +97,10 @@ public class BluetoothActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
+
+        if(user == null){
+            startActivity(new Intent(BluetoothActivity.this, LoginActivity.class));
+        }
 
         SwitchBluetooth = findViewById(R.id.bluetoothSwitch);
         ButtonSearch = findViewById(R.id.searchButton);

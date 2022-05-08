@@ -57,7 +57,7 @@
     <TextView
         android:id="@+id/successText"
         android:layout_width="match_parent"
-        android:layout_height="358dp"
+        android:layout_height="253dp"
         android:layout_gravity="center"
         android:textSize="20dp" />
 

@@ -220,16 +220,27 @@ public class UserInfoFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 switch(i){
                     case 0: location = "서울";
+                        break;
                     case 1: location = "인천";
+                        break;
                     case 2: location = "경기도";
+                        break;
                     case 3: location = "강원도";
+                        break;
                     case 4: location = "충청북도";
+                        break;
                     case 5: location = "충청남도";
+                        break;
                     case 6: location = "전라북도";
+                        break;
                     case 7: location = "전라남도";
+                        break;
                     case 8: location = "경상북도";
+                        break;
                     case 9: location = "경상남도";
+                        break;
                     case 10: location = "제주도";
+                        break;
                 }
             }
 
@@ -238,6 +249,7 @@ public class UserInfoFragment extends Fragment {
 
             }
         });
+        spinner.setSelection(0);
 
         initUserInfo = rootview.findViewById(R.id.initUserInfo);
         initUserInfo.setOnClickListener(new View.OnClickListener() {
@@ -256,7 +268,7 @@ public class UserInfoFragment extends Fragment {
                             Intent intent = new Intent(activity, LoginActivity.class);
                             startActivity(intent);
                         }
-                    }, 5000); // 0.5초후
+                    }, 3000); // 0.5초후
                 }
                 else{
                     activity.startToast("모든 값을 입력해주세요.");
