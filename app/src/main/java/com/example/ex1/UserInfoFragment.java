@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +26,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
+
+import java.util.HashMap;
 
 
 public class UserInfoFragment extends Fragment {
@@ -62,6 +66,7 @@ public class UserInfoFragment extends Fragment {
         super.onAttach(context);
 //이 메소드가 호출될떄는 프래그먼트가 엑티비티위에 올라와있는거니깐 getActivity메소드로 엑티비티참조가능
         activity = (SignUpActivity) getActivity();
+        user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -73,6 +78,8 @@ public class UserInfoFragment extends Fragment {
 
     private void init(String location, String detergentType, int laundryVol, String name, String phoneNum){
         // 데이터베이스 users 콜렉션 안에서 사용자 회원별 uid document로 접속
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
         DocumentReference docRef = activity.db.collection("datas").document(user.getUid()).collection("userInfo").document("userInfo");
         UserInfo userInfo = new UserInfo(location,detergentType,laundryVol,name,phoneNum, activity.userId);
         docRef.set(userInfo)
@@ -90,7 +97,7 @@ public class UserInfoFragment extends Fragment {
                 });
 
         docRef = activity.db.collection("datas").document(user.getUid()).collection("userInfo").document("userFeature");
-        UserFeature userFeature = new UserFeature(7.0,7.0,1.0,1.0,7.0,7.0, CalendarDay.today().toString(),CalendarDay.today().toString());
+        UserFeature userFeature = new UserFeature(0.0,0.0,1.0,1.0,7.0,7.0);
         docRef.set(userFeature)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -104,8 +111,9 @@ public class UserInfoFragment extends Fragment {
                         activity.startToast(e.toString());
                     }
                 });
+        /*
         docRef = activity.db.collection("datas").document(user.getUid()).collection("featureAnalysis").document("period1");
-        docRef.set(null)
+        docRef.set({})
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -120,7 +128,7 @@ public class UserInfoFragment extends Fragment {
                 });
 
         docRef = activity.db.collection("datas").document(user.getUid()).collection("featureAnalysis").document("period2");
-        docRef.set(null)
+        docRef.set({})
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -134,7 +142,7 @@ public class UserInfoFragment extends Fragment {
                     }
                 });
         docRef = activity.db.collection("datas").document(user.getUid()).collection("featureAnalysis").document("preweight1");
-        docRef.set(null)
+        docRef.set({})
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -148,7 +156,7 @@ public class UserInfoFragment extends Fragment {
                     }
                 });
         docRef = activity.db.collection("datas").document(user.getUid()).collection("featureAnalysis").document("weight_increment1");
-        docRef.set(null)
+        docRef.set({})
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -166,9 +174,7 @@ public class UserInfoFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        activity.startToast("로그인을 진행해 주세요.");
-                        Intent intent = new Intent(activity, LoginActivity.class);
-                        startActivity(intent);
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -178,6 +184,7 @@ public class UserInfoFragment extends Fragment {
                     }
                 });
 
+         */
     }
 
     @Override
@@ -241,12 +248,24 @@ public class UserInfoFragment extends Fragment {
                     phoneNum = infoPhoneNum.getText().toString();
                     laundryVol = Integer.parseInt(volumeText.getText().toString());
                     init(location,detergentType,laundryVol,name,phoneNum);
+
+                    activity.startToast("잠시뒤 로그인화면으로 돌아갑니다.");
+                    Handler mHandler = new Handler();
+                    mHandler.postDelayed(new Runnable() {
+                        public void run() {
+                            Intent intent = new Intent(activity, LoginActivity.class);
+                            startActivity(intent);
+                        }
+                    }, 5000); // 0.5초후
                 }
                 else{
                     activity.startToast("모든 값을 입력해주세요.");
                 }
             }
         });
+
+
+
         return rootview;
     }
 }

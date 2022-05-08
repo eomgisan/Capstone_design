@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     Fragment recommandFM = new RecommandFragment();
     Fragment featureFM = new FeatureFragment();
     Fragment communityFM = new CommunityFragment();
-    Fragment bluetoothFM = new BluetoothFragment();
+
 
     // 블루투스
 
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
      // 블루투스 페어링 관련
     Set<BluetoothDevice> pairedDevices;
-    boolean paired = false;
+
 
     Set<BluetoothDevice> unpairedDevices = new HashSet<>();
     List<String> unpairedList = new ArrayList<>();
@@ -83,8 +83,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-    double vol1;
-    double vol2;
+
 
     Datas datas = new Datas();
     UserInfo userInfo = new UserInfo();
@@ -99,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     WebView webView;
 
+    int dbState;
 
 
 
@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
         NetworkManager network = new NetworkManager(getApplicationContext());
         network.registerNetworkCallback();
 
+        dbState = 0;
         // Check network connection
         if (Variables.isNetworkConnected()){
             // Internet Connected
@@ -195,6 +196,9 @@ public class MainActivity extends AppCompatActivity {
                             RecommandDates2 = weather(datas.getWeight2(),userFeature.getIdeal_w2(),userFeature.getAver_inc2());
                             apiFinish = true;
                             Log.d("zzzzzzzzzzzzzzzzzzzzz","빨래날짜 추천 계산 완료");
+
+
+
                             break;
                         }
                     }
@@ -223,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         CalendarDay result = CalendarDay.today();
 
 
-        if(datas.getSmell() >10 || weight > 10){
+        if(datas.getSmell() > 10 || weight > ideal_w){
             // 오늘 추천후 알아서 빨래하쎔 ㄱㄱ
             recommand.add(result);
 
@@ -296,6 +300,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG + "zzzzzzzzzzzzzzzzzzzzzzzz",score[i]+"");
 
             }
+
 
             result = CalendarDay.from(result.getYear(),result.getMonth(),result.getDay()+max);
 
@@ -495,11 +500,14 @@ public class MainActivity extends AppCompatActivity {
                                 Double temp = Double.valueOf(document.getData().get("temp").toString());
                                 Double weight1 = Double.valueOf(document.getData().get("weight1").toString());
                                 Double weight2 = Double.valueOf(document.getData().get("weight2").toString());
-
+                                Log.d("TTTTTTTTTTTTTTT", datas.isnull + "?" );
                                 datas = new Datas(hum, smell, temp, weight1, weight2);
+                                Log.d("TTTTTTTTTTTTTTT", datas.isnull + "??" );
                             }
                             else{
                                 Log.d(TAG, "아직 센서값이 없습니다.", task.getException());
+                                dbState = -1;
+
                             }
                         }
                     } else {
@@ -530,9 +538,11 @@ public class MainActivity extends AppCompatActivity {
                             String userId = document.getData().get("userId").toString();
 
                             userInfo = new UserInfo(address,detergentType,laundryVol,name,phoneNum,userId);
+
                         }
                         else{
                             Log.d(TAG, "아직 셋팅값이 없습니다.", task.getException());
+
                         }
 
 
@@ -558,10 +568,9 @@ public class MainActivity extends AppCompatActivity {
                             Double averinc2 = Double.valueOf(document.getData().get("averIncWeight2").toString());
                             Double ideal_w1 = Double.valueOf(document.getData().get("ideal_w1").toString());
                             Double ideal_w2 = Double.valueOf(document.getData().get("ideal_w2").toString());
-                            String recommand1 = document.getData().get("recommand1").toString();
-                            String recommand2 = document.getData().get("recommand2").toString();
 
-                            userFeature = new UserFeature(averinc1,averinc2,priod1,priod2,ideal_w1,ideal_w2,recommand1,recommand2);
+
+                            userFeature = new UserFeature(averinc1,averinc2,priod1,priod2,ideal_w1,ideal_w2);
                         }
                         else{
                             Log.d(TAG, "아직 사용자 주기 파악이 안되었습니다.");
@@ -573,6 +582,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+
+
         }
     }
 

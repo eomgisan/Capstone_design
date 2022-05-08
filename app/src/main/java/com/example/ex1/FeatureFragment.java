@@ -111,7 +111,7 @@ public class FeatureFragment extends Fragment {
         BarData barDataP = new BarData();
         BarData barDataW = new BarData();
 
-        if(userFeature.isnull){
+        if(userFeature.getAver_inc1() == 0 && userFeature.getAver_inc2() == 0){
             activity.startToast("아직 사용자의 빨래 정보가 데이터베이스에 없습니다!");
         }
         else{

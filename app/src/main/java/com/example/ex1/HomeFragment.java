@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,9 +59,11 @@ public class HomeFragment extends Fragment {
     }
 
     private void init() {
-        activity.startFirebase();
+
         // document가 비어있을경우 확인
-        if (activity.datas.isnull == true) {
+
+
+        if (activity.datas.isnull) {
             // 데이터베이스에 센서 정보 없으면 블루투스 프레그먼트 전환
             Log.d(TAG, "No such sensorData");
 
@@ -82,12 +86,12 @@ public class HomeFragment extends Fragment {
             hum.setText(String.valueOf(activity.datas.getHumidity()));
             smell.setText(String.valueOf(activity.datas.getSmell()));
 
-            if (activity.vol1 < 0) {
+            if (activity.datas.getWeight1() < 0) {
                 BinImage1.setImageResource(R.drawable.bin);
-            } else if (activity.vol1 < 50) {
+            } else if (activity.datas.getWeight1()  < 5) {
                 BinImage1.setImageResource(R.drawable.bin);
                 BinImage1.setColorFilter(Color.rgb(0,255,0));
-            } else if (activity.vol1 < 80) {
+            } else if (activity.datas.getWeight1()  < 8) {
                 BinImage1.setImageResource(R.drawable.bin);
                 BinImage1.setColorFilter(Color.rgb(255,255,0));;
             } else {
@@ -95,12 +99,12 @@ public class HomeFragment extends Fragment {
                 BinImage1.setColorFilter(Color.rgb(255,0,0));
             }
 
-            if (activity.vol2 < 0) {
+            if (activity.datas.getWeight2()  < 0) {
                 BinImage2.setImageResource(R.drawable.bin);
-            } else if (activity.vol2 < 50) {
+            } else if (activity.datas.getWeight2()  < 5) {
                 BinImage2.setImageResource(R.drawable.bin);
                 BinImage2.setColorFilter(Color.rgb(0,255,0));;
-            } else if (activity.vol2 < 80) {
+            } else if (activity.datas.getWeight2()  < 8) {
                 BinImage2.setImageResource(R.drawable.bin);
                 BinImage2.setColorFilter(Color.rgb(255,255,0));;
             } else {
@@ -133,12 +137,20 @@ public class HomeFragment extends Fragment {
         goToBlueTooth = rootview.findViewById(R.id.goTOBluetooth);
         logOut = rootview.findViewById(R.id.logOut);
 
-        init();
+        Handler mHandler = new Handler();
+        mHandler.postDelayed(new Runnable() {
+            public void run() {
+                init();
+            }
+        }, 1000); // 0.5초후
+
+
 
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // activity.sendData("재측정 신호!!!!!!!!!!!!!");
+                activity.startFirebase();
                 init();
                 activity.RecommandDates1 = activity.weather(activity.datas.getWeight1(),activity.userFeature.getIdeal_w1(),activity.userFeature.getAver_inc1());
                 activity.RecommandDates2 = activity.weather(activity.datas.getWeight2(),activity.userFeature.getIdeal_w2(),activity.userFeature.getAver_inc2());

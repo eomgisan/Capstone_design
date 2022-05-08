@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.ex1.dataStructure.Datas;
+import com.example.ex1.dataStructure.UserInfo;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -88,14 +90,24 @@ public class SignUpFragment extends Fragment {
 
                                                         activity.startToast("회원가입에 성공하였습니다.");
                                                         //성공시 로직
+
                                                         activity.user = activity.mAuth.getCurrentUser();
                                                         activity.userId = UserId;
                                                         activity.loginEmail = LoginEmail;
                                                         activity.loginPassword = LoginPassword;
 
+                                                        DocumentReference docRef = activity.db.collection("datas").document("ID");
+                                                        docRef.update(UserId,"id");
+
+                                                        Handler mHandler = new Handler();
+                                                        mHandler.postDelayed(new Runnable() {
+                                                            public void run() {
+                                                                activity.goToSignUpFM();
+                                                            }
+                                                        }, 1000); // 0.5초후
 
                                                         // 프레그먼트 전환
-                                                        activity.goToSignUpFM();
+
 
 
                                                     } else {

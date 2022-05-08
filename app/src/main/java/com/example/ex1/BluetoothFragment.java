@@ -33,8 +33,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -51,7 +56,25 @@ public class BluetoothFragment extends Fragment {
     MainActivity activity;
 
     UUID BT_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
-    BluetoothSocket btSocket;
+
+    BluetoothAdapter mBluetoothAdapter;
+    BluetoothDevice mbluetoothDevice;
+
+    Set<BluetoothDevice> pairedDevices = new HashSet<>();
+    Set<BluetoothDevice> unpairedDevices = new HashSet<>();
+
+    List<String> pairedList = new ArrayList<>();
+    List<String> unpairedList = new ArrayList<>();
+
+    ArrayAdapter<String> adapter;
+
+    // 블루투스 데이터 송수신 관련
+    BluetoothSocket bluetoothSocket;
+    OutputStream outputStream;
+    InputStream inputStream;
+    boolean paired = false;
+    byte[] userUid;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -62,13 +85,31 @@ public class BluetoothFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        try{
+            inputStream.close();
+            outputStream.close();
+            bluetoothSocket.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
 //이제 더이상 엑티비티 참초가안됨
         activity.unregisterReceiver(mReceiver);
         activity = null;
     }
 
 
-
+    private void sendData(String string){
+        byte[] data = string.getBytes();
+        Log.d("blutoothSend",string);
+        try{
+            outputStream.write(data);
+            Log.d(TAG,"블루투스 통신 성공");
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            activity.startToast("데이터 전송 오류");
+        }
+    }
 
 
     private ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
@@ -94,13 +135,13 @@ public class BluetoothFragment extends Fragment {
 
     // 블루투스 on 함수
     private void blueToothOn(TextView status) {
-        if (activity.mBluetoothAdapter == null) {
+        if (mBluetoothAdapter == null) {
             Log.d(TAG,"BluetoothOn 함수 동작 - 블루투스어댑터 존재 X");
             activity.startToast("블루투스 동작 불가능한 기기입니다.");
             status.setText("블루투스 동작 불가능한 기기입니다.");
 
 
-        } else if (activity.mBluetoothAdapter.isEnabled()) {
+        } else if (mBluetoothAdapter.isEnabled()) {
             Log.d(TAG,"BluetoothOn 함수 동작 - 블루투스어댑터 존재 ok, 활성화 이미 완료");
             activity.startToast("이미 블루투스가 활성화 되어있습니다.");
             // 활성화가 이미 되어있는것으로 페어링 단계를 들어가야함
@@ -112,7 +153,7 @@ public class BluetoothFragment extends Fragment {
             // 이는 시스템 액티비티를 화면을 띄워서 블루투스를 직접 할수 있다.
             Log.d(TAG,"BluetoothOn 함수 동작 - 블루투스어댑터 존재 ok, 활성화 시작");
 
-            Intent intentBluetoothEnable = new Intent(activity.mBluetoothAdapter.ACTION_REQUEST_ENABLE);
+            Intent intentBluetoothEnable = new Intent(mBluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityResult.launch(intentBluetoothEnable);
 
         }
@@ -122,9 +163,9 @@ public class BluetoothFragment extends Fragment {
     private void selectDevice(){
 
         // 페어링 된 객체 집합 불러오기
-        activity.pairedDevices = activity.mBluetoothAdapter.getBondedDevices();
+        pairedDevices = mBluetoothAdapter.getBondedDevices();
 
-        Log.d(TAG,"이미 페어링된 객체들" + activity.pairedDevices.toString());
+        Log.d(TAG,"이미 페어링된 객체들" + pairedDevices.toString());
 
         // 안드로이드에 선언되어있는 alertdialog 사용, 목록 창 띄우는거임
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -132,7 +173,7 @@ public class BluetoothFragment extends Fragment {
 
         // 리스트 배열 만들기
         java.util.List<String> pairedList = new ArrayList<>();
-        for(BluetoothDevice device : activity.pairedDevices) {
+        for(BluetoothDevice device : pairedDevices) {
             pairedList.add(device.getName());
         }
 
@@ -145,9 +186,9 @@ public class BluetoothFragment extends Fragment {
         builder.setItems(devices, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                    activity.mBluetoothAdapter.cancelDiscovery();
-                    activity.paired = true;
-                    connectDevice(devices[which].toString(), activity.paired);
+                    mBluetoothAdapter.cancelDiscovery();
+                    paired = true;
+                    connectDevice(devices[which].toString(), paired);
                     Log.d(TAG,devices[which].toString());
 
             }
@@ -162,8 +203,8 @@ public class BluetoothFragment extends Fragment {
     public void discoverOn(){                                              //Method for setting bluetooth on discoverable mode
         //for 5 minutes
         Intent discoverableIntent =
-                new Intent(activity.mBluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(activity.mBluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+                new Intent(mBluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(mBluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         startActivityForResult(discoverableIntent, 1);
     }
 
@@ -172,10 +213,10 @@ public class BluetoothFragment extends Fragment {
 
         discoverOn();
         // 이미 검색 중이라면 검색을 종료하고, 다시 검색 시작
-        if(activity.mBluetoothAdapter.isDiscovering()) {
-            activity.mBluetoothAdapter.cancelDiscovery();
+        if(mBluetoothAdapter.isDiscovering()) {
+            mBluetoothAdapter.cancelDiscovery();
         }
-        activity.mBluetoothAdapter.startDiscovery();
+        mBluetoothAdapter.startDiscovery();
 
 
         IntentFilter filter = new IntentFilter();
@@ -196,16 +237,16 @@ public class BluetoothFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity); // 다이얼로그 생성
         builder.setTitle("페어링할 기기 탐색");
 
-        activity.adapter = new ArrayAdapter<>(activity,
-                android.R.layout.simple_list_item_1, activity.unpairedList);
+        adapter = new ArrayAdapter<>(activity,
+                android.R.layout.simple_list_item_1, unpairedList);
 
-        builder.setAdapter(activity.adapter, new DialogInterface.OnClickListener() {
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                activity.mBluetoothAdapter.cancelDiscovery();
-                String name = activity.adapter.getItem(which);
-                activity.unpairedList.remove(name);
-                activity.paired = false;
+                mBluetoothAdapter.cancelDiscovery();
+                String name = adapter.getItem(which);
+                unpairedList.remove(name);
+                paired = false;
                 connectDevice(name, false);
 
             }
@@ -241,12 +282,12 @@ public class BluetoothFragment extends Fragment {
 
     private void add(BluetoothDevice device) {
         Log.d("지금",device.getName()+"탐색됨");
-        if(!(activity.pairedDevices.contains(device))) {
-            if(activity.unpairedDevices.add(device)) {
-                activity.unpairedList.add(device.getName());
+        if(!(pairedDevices.contains(device))) {
+            if(unpairedDevices.add(device)) {
+                unpairedList.add(device.getName());
             }
         }
-        activity.adapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
         Log.d("지금",device.getName()+"탐색됨");
     }
 
@@ -260,7 +301,7 @@ public class BluetoothFragment extends Fragment {
     protected BluetoothDevice getPairedDevice(String name) {
         BluetoothDevice selectedDevice = null;
 
-        for(BluetoothDevice device : activity.pairedDevices) {
+        for(BluetoothDevice device : pairedDevices) {
             if(name.equals(device.getName())) {
                 selectedDevice = device;
                 break;
@@ -272,7 +313,7 @@ public class BluetoothFragment extends Fragment {
     protected BluetoothDevice getUnpairedDevice(String name) {
         BluetoothDevice selectedDevice = null;
 
-        for(BluetoothDevice device : activity.unpairedDevices) {
+        for(BluetoothDevice device : unpairedDevices) {
             if(name.equals(device.getName())) {
                 selectedDevice = device;
                 break;
@@ -285,12 +326,12 @@ public class BluetoothFragment extends Fragment {
             throws IOException {
         if(Build.VERSION.SDK_INT >= 10){
             try {
-                final Method m = device.getClass().getMethod("createRfcommSocket", new Class[] { int.class });
+                final Method m = device.getClass().getMethod("createInsecureRfcommSocket", new Class[] { int.class });
                 return (BluetoothSocket) m.invoke(device, 1); }
             catch (Exception e) {
                 Log.e(TAG, "Could not create Insecure RFComm Connection",e); }
         }
-        return device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
+        return device.createInsecureRfcommSocketToServiceRecord(BT_MODULE_UUID);
     }
 
 
@@ -305,8 +346,8 @@ public class BluetoothFragment extends Fragment {
                     try{
                         Log.d(TAG,"인풋 아웃풋 스트림 생성");
                         // 입출력 스트림 객체 생성
-                        activity.outputStream = activity.bluetoothSocket.getOutputStream();
-                        activity.inputStream = activity.bluetoothSocket.getInputStream();
+                        outputStream = bluetoothSocket.getOutputStream();
+                        inputStream = bluetoothSocket.getInputStream();
                         activity.startToast("블루투스 연결 성공! 사용자 정보를 빨래통 전달해주세요");
 
                         // 데이터 수신 함수 호출
@@ -318,7 +359,7 @@ public class BluetoothFragment extends Fragment {
                 } else { // 연결 오류나면
                     activity.startToast("연결오류");
                     try {
-                        activity.bluetoothSocket.close(); // 소켓 닫아주고 리소스 해제
+                        bluetoothSocket.close(); // 소켓 닫아주고 리소스 해제
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -331,21 +372,22 @@ public class BluetoothFragment extends Fragment {
                 Log.d(TAG, "스레드 생성");
                 if (paired){  // 페어링된 기기라면
                     Log.d(TAG, "페어링 기기?");
-                    activity.mbluetoothDevice = getPairedDevice(selectedDeviceName);
-                    Log.d(TAG,activity.mbluetoothDevice.getName());
+                    mbluetoothDevice = getPairedDevice(selectedDeviceName);
+                    Log.d(TAG,mbluetoothDevice.getName());
                 }
                 else {    // 페어링되지 않은 기기라면
                     Log.d(TAG, "페어링 아님?");
-                    activity.mbluetoothDevice = getUnpairedDevice(selectedDeviceName);
+                    mbluetoothDevice = getUnpairedDevice(selectedDeviceName);
                 }
-                // UUID 생성
-                UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-                BluetoothDevice device = activity.mbluetoothDevice;
 
+                BluetoothDevice device = mbluetoothDevice;
+                /*
                 try {
 
-                    activity.bluetoothSocket = createBluetoothSocket(activity.mbluetoothDevice);
-                    activity.bluetoothSocket.connect(); 	  // 소켓 연결
+                    bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(BT_MODULE_UUID);
+                    Log.d(TAG,bluetoothSocket.toString());
+
+                    bluetoothSocket.connect(); 	  // 소켓 연결
                     Log.d(TAG,"소켓 생성 완료");
                     mHandler.sendEmptyMessage(1); // 핸들러에 메시지 1 보내기
 
@@ -356,16 +398,43 @@ public class BluetoothFragment extends Fragment {
                     Log.d(TAG,"소켓연결 실패");
                     mHandler.sendEmptyMessage(-1); // 핸들러에 메시지 -1 보내기
                 }
+
+                 */
+                try {
+                    bluetoothSocket = device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
+                } catch (Exception e) {Log.e("","Error creating socket");}
+
+                try {
+                    bluetoothSocket.connect();
+                    Log.e("","Connected");
+                    mHandler.sendEmptyMessage(1);
+                } catch (IOException e) {
+                    Log.e("",e.getMessage());
+                    try {
+                        Log.e("","trying fallback...");
+
+                        bluetoothSocket =(BluetoothSocket) device.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(device,3);
+                        bluetoothSocket.connect();
+
+                        Log.e("","Connected");
+                        mHandler.sendEmptyMessage(1);
+                    }
+
+                    catch (Exception e2) {
+                        Log.e("", "Couldn't establish Bluetooth connection!");
+                        mHandler.sendEmptyMessage(-1);
+                    }
+                }
             }
         });
         thread.start(); // 별도 스레드 시작
     }
 
     protected void sendUid(boolean isSuccess){
-        activity.userUid = activity.user.getUid().getBytes();
-        Log.d(TAG,activity.userUid.toString());
+        userUid = activity.user.getUid().getBytes();
+        Log.d(TAG,userUid.toString());
         try{
-            activity.outputStream.write(activity.userUid);
+            outputStream.write(userUid);
             isSuccess = true;
 
             Log.d(TAG,"사용자 유아이디 전송 완료");
@@ -399,8 +468,10 @@ public class BluetoothFragment extends Fragment {
 
 
         boolean isSuccess = false;
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothAdapter.disable();
 
-        if(activity.mBluetoothAdapter.isEnabled()){
+        if(mBluetoothAdapter.isEnabled()){
             Status.setText("블루투스 권한 허용");
             SwitchBluetooth.setChecked(true);
         }
@@ -417,7 +488,7 @@ public class BluetoothFragment extends Fragment {
                 }
                 else {
                     Log.d("블루투스 프레그먼트","스위치 꺼짐");
-                    activity.mBluetoothAdapter.disable();
+                    mBluetoothAdapter.disable();
                     Status.setText("블루투스 권한 종료");
 
                 }

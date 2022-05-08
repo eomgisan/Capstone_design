@@ -10,8 +10,7 @@ public class UserFeature {
 
 
     private double ideal_w2;
-    private String recommand1;
-    private String recommand2;
+
 
     public boolean isnull;
 
@@ -19,7 +18,7 @@ public class UserFeature {
         isnull = true;
     }
 
-    public UserFeature(double aver_inc1, double aver_inc2, double priod1,double priod2, double ideal_w1, double ideal_w2, String recommand1, String recommand2) {
+    public UserFeature(double aver_inc1, double aver_inc2, double priod1,double priod2, double ideal_w1, double ideal_w2) {
         this.aver_inc1 = aver_inc1;
         this.aver_inc2 = aver_inc2;
         this.priod1 = priod1;
@@ -28,8 +27,7 @@ public class UserFeature {
         this.ideal_w1 = ideal_w1;
         this.ideal_w2 = ideal_w2;
 
-        this.recommand1 = recommand1;
-        this.recommand2 = recommand2;
+
         isnull = false;
     }
     public double getIdeal_w1() {
@@ -79,19 +77,5 @@ public class UserFeature {
         this.priod2 = priod2;
     }
 
-    public String getRecommand1() {
-        return recommand1;
-    }
 
-    public void setRecommand1(String recommand1) {
-        this.recommand1 = recommand1;
-    }
-
-    public String getRecommand2() {
-        return recommand2;
-    }
-
-    public void setRecommand2(String recommand2) {
-        this.recommand2 = recommand2;
-    }
 }

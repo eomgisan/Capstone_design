@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 
+import retrofit2.http.Url;
+
 
 public class CommunityFragment extends Fragment {
 
@@ -37,6 +39,8 @@ public class CommunityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        String url = "http://192.168.0.13:8090/pro30/member/login.do" + "?uid=" + activity.user.getUid();
         ViewGroup rootview = (ViewGroup) inflater.inflate(R.layout.fragment_community, container, false);
 
         activity.webView = rootview.findViewById(R.id.webView);
@@ -56,7 +60,7 @@ public class CommunityFragment extends Fragment {
         activity.webView.getSettings().setDomStorageEnabled(true);  // 로컬 스토리지 (localStorage) 사용여부용 여부
 
 
-        activity.webView.loadUrl("https://www.naver.com");
+        activity.webView.loadUrl(url);
 
         return rootview;
     }
