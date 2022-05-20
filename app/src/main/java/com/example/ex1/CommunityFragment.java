@@ -40,7 +40,7 @@ public class CommunityFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        String url = "http://192.168.0.13:8090/pro30/member/login.do" + "?uid=" + activity.user.getUid();
+        String url = "http://192.168.62.249:8090/pro30/member/login.do" + "?uid=" + activity.user.getUid();
         ViewGroup rootview = (ViewGroup) inflater.inflate(R.layout.fragment_community, container, false);
 
         activity.webView = rootview.findViewById(R.id.webView);

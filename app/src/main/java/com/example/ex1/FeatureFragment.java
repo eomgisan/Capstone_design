@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 
 public class FeatureFragment extends Fragment {
@@ -79,15 +80,6 @@ public class FeatureFragment extends Fragment {
         super.onDetach();
 //이제 더이상 엑티비티 참초가안됨
         activity = null;
-    }
-
-    public class MyValueFormatter extends ValueFormatter implements IValueFormatter {
-
-        @Override
-        public String getFormattedValue(float value) {
-            // write your logic here
-            return String.valueOf(value);
-        }
     }
 
 
@@ -126,22 +118,19 @@ public class FeatureFragment extends Fragment {
                         Map map = document.getData();
                         if(map.size() != 0){
                                 ArrayList<BarEntry> entries = new ArrayList<>();
-                                List<String> keyList = new ArrayList<>(map.keySet());
+                                TreeMap map1 = new TreeMap(map);
+                                List<String> keyList = new ArrayList<>(map1.keySet());
                             for(int i =0; i<6 && i<keyList.size()-1 ; i++){
-                                float now = Float.valueOf(keyList.get(i).toString());
-                                float next = Float.valueOf(keyList.get(i+1).toString());
-
                                 try{
-                                    Date date1 = dateFormat.parse(keyList.get(i));
-                                    Date date2 = dateFormat.parse(keyList.get(i+1));
+                                    Date date1 = dateFormat.parse(keyList.get(keyList.size()-1-i));
+                                    Date date2 = dateFormat.parse(keyList.get(keyList.size()-1-(i+1)));
                                     long day = (date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24);
 
-                                    entries.add(new BarEntry(i+1,day));
+                                    entries.add(new BarEntry(i,day));
 
                                 }catch(Exception e){
-                                    Log.d("지금",keyList.get(i));
-                                    Log.d("지금",keyList.get(i+1));
-                                    Log.d("지금",e.toString());
+
+                                    Log.d("FeatureFragment",e.toString());
                                 }
                             }
                             BarDataSet barDataSetP1 = new BarDataSet(entries,"1번빨래통");
@@ -201,22 +190,19 @@ public class FeatureFragment extends Fragment {
 
                         if(map.size() != 0) {
                             ArrayList<BarEntry> entries = new ArrayList<>();
-                            List<String> keyList = new ArrayList<>(map.keySet());
+                            TreeMap map1 = new TreeMap(map);
+                            List<String> keyList = new ArrayList<>(map1.keySet());
                             for (int i = 0; i < 6 && i < keyList.size() - 1; i++) {
-                                float now = Float.valueOf(keyList.get(i));
-                                float next = Float.valueOf(keyList.get(i + 1).toString());
-
-                                try{
-                                    Date date1 = dateFormat.parse(keyList.get(i));
-                                    Date date2 = dateFormat.parse(keyList.get(i+1));
+                                                                try{
+                                    Date date1 = dateFormat.parse(keyList.get(keyList.size()-1-i));
+                                    Date date2 = dateFormat.parse(keyList.get(keyList.size()-1-(i+1)));
                                     long day = (date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24);
 
-                                    entries.add(new BarEntry(i+1,day));
+                                    entries.add(new BarEntry(i,day));
 
                                 }catch(Exception e){
-                                    Log.d("지금",keyList.get(i));
-                                    Log.d("지금",keyList.get(i+1));
-                                    Log.d("지금",e.toString());
+
+                                    Log.d("FeatureFragment",e.toString());
                                 }
                             }
                             BarDataSet barDataSetP2 = new BarDataSet(entries, "2번빨래통");
@@ -226,9 +212,10 @@ public class FeatureFragment extends Fragment {
 
                             barDataP.addDataSet(barDataSetP2);
 
-                            barDataP.setBarWidth(0.5f);
+                            barDataP.setBarWidth(0.25f);
 
                             XAxis xAxis = periodChart1.getXAxis();
+                            xAxis.setGranularity(1f);
                             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); //x 축 표시에 대한 위치 설정
                             xAxis.setValueFormatter(new ValueFormatter() {
 
@@ -272,12 +259,11 @@ public class FeatureFragment extends Fragment {
                         Map map = document.getData();
                         if(map.size() != 0) {
                             ArrayList<BarEntry> entries = new ArrayList<>();
-                            List<String> keyList = new ArrayList<>(map.keySet());
+                            TreeMap map1 = new TreeMap(map);
+                            List<String> keyList = new ArrayList<>(map1.keySet());
                             for (int i = 0; i < 7 && i < keyList.size() - 1; i++) {
-                                float now = Float.valueOf(keyList.get(i).toString());
-                                float weight = Float.valueOf(String.valueOf(map.get(keyList.get(i))));
+                                float weight = Float.valueOf(String.valueOf(map.get(keyList.get(keyList.size()-1-i))));
                                 entries.add(new BarEntry(i, weight));
-
                             }
                             BarDataSet barDataSetW1 = new BarDataSet(entries, "1번빨래통");
                             barDataSetW1.setColor(Color.RED);
@@ -298,6 +284,7 @@ public class FeatureFragment extends Fragment {
                                     return labels[(int) value];
                                 }
                             });
+                            xAxis.setGranularity(1f);
                             YAxis yAxisLeft = incChart1.getAxisLeft();
                             yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); //Y축 텍스트 컬러 설정
                             yAxisLeft.setGridColor(ContextCompat.getColor(getContext(), R.color.black)); // Y축 줄의 컬러 설정
@@ -331,12 +318,11 @@ public class FeatureFragment extends Fragment {
                         Map map = document.getData();
                         if(map.size() != 0) {
                             ArrayList<BarEntry> entries = new ArrayList<>();
-                            List<String> keyList = new ArrayList<>(map.keySet());
+                            TreeMap map1 = new TreeMap(map);
+                            List<String> keyList = new ArrayList<>(map1.keySet());
                             for (int i = 0; i < 7 && i < keyList.size() - 1; i++) {
-                                float now = Float.valueOf(keyList.get(i));
-                                float weight = Float.valueOf(String.valueOf(map.get(keyList.get(i))));
+                                float weight = Float.valueOf(String.valueOf(map.get(keyList.get(keyList.size()-1-i))));
                                 entries.add(new BarEntry(i, weight));
-
                             }
                             BarDataSet barDataSetW1 = new BarDataSet(entries, "2번빨래통");
                             barDataSetW1.setColor(Color.BLUE);
@@ -357,6 +343,7 @@ public class FeatureFragment extends Fragment {
                                     return labels[(int) value];
                                 }
                             });
+                            xAxis.setGranularity(1f);
                             YAxis yAxisLeft = incChart1.getAxisLeft();
                             yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); //Y축 텍스트 컬러 설정
                             yAxisLeft.setGridColor(ContextCompat.getColor(getContext(), R.color.black)); // Y축 줄의 컬러 설정
@@ -384,10 +371,16 @@ public class FeatureFragment extends Fragment {
 
         }
 
-        averInc1.setText(activity.userFeature.getAver_inc1()+"kg");
-        averInc2.setText(activity.userFeature.getAver_inc2()+"kg");
-        averPeriod1.setText(activity.userFeature.getPriod1()+"일");
-        averPeriod2.setText(activity.userFeature.getPriod2()+"일");
+
+        String averinc1 = String.format("%.2f",activity.userFeature.getAver_inc1());
+        String averinc2 = String.format("%.2f",activity.userFeature.getAver_inc2());
+        String averperiod1 = String.format("%.2f",activity.userFeature.getPriod1());
+        String averperiod2 = String.format("%.2f",activity.userFeature.getPriod2());
+
+        averInc1.setText(averinc1+"kg");
+        averInc2.setText(averinc2+"kg");
+        averPeriod1.setText(averperiod1+"일");
+        averPeriod2.setText(averperiod2+"일");
 
 
 

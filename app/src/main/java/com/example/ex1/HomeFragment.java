@@ -80,6 +80,7 @@ public class HomeFragment extends Fragment {
 
             if (activity.datas.getWeight1() < 0) {
                 BinImage1.setImageResource(R.drawable.bin);
+                BinImage1.setColorFilter(Color.rgb(0,255,0));
             } else if (activity.datas.getWeight1()  < 5) {
                 BinImage1.setImageResource(R.drawable.bin);
                 BinImage1.setColorFilter(Color.rgb(0,255,0));
@@ -93,6 +94,7 @@ public class HomeFragment extends Fragment {
 
             if (activity.datas.getWeight2()  < 0) {
                 BinImage2.setImageResource(R.drawable.bin);
+                BinImage2.setColorFilter(Color.rgb(0,255,0));;
             } else if (activity.datas.getWeight2()  < 5) {
                 BinImage2.setImageResource(R.drawable.bin);
                 BinImage2.setColorFilter(Color.rgb(0,255,0));;
