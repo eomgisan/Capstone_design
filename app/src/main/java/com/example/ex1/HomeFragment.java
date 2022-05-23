@@ -136,7 +136,7 @@ public class HomeFragment extends Fragment {
             public void run() {
                 init();
             }
-        }, 1000); // 0.5초후
+        }, 2000); // 0.5초후
 
 
 

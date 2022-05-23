@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,6 +104,13 @@ public class FeatureFragment extends Fragment {
         BarData barDataP = new BarData();
         BarData barDataW = new BarData();
 
+
+
+        ArrayList<BarEntry> entriesW1 = new ArrayList<>();
+        ArrayList<BarEntry> entriesW2 = new ArrayList<>();
+        ArrayList<BarEntry> entriesP1 = new ArrayList<>();
+        ArrayList<BarEntry> entriesP2 = new ArrayList<>();
+
         if(userFeature.getAver_inc1() == 0 && userFeature.getAver_inc2() == 0){
             activity.startToast("아직 사용자의 빨래 정보가 데이터베이스에 없습니다!");
         }
@@ -117,7 +125,7 @@ public class FeatureFragment extends Fragment {
 
                         Map map = document.getData();
                         if(map.size() != 0){
-                                ArrayList<BarEntry> entries = new ArrayList<>();
+
                                 TreeMap map1 = new TreeMap(map);
                                 List<String> keyList = new ArrayList<>(map1.keySet());
                             for(int i =0; i<6 && i<keyList.size()-1 ; i++){
@@ -126,50 +134,13 @@ public class FeatureFragment extends Fragment {
                                     Date date2 = dateFormat.parse(keyList.get(keyList.size()-1-(i+1)));
                                     long day = (date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24);
 
-                                    entries.add(new BarEntry(i,day));
+                                    entriesP1.add(new BarEntry(i,day));
 
                                 }catch(Exception e){
 
                                     Log.d("FeatureFragment",e.toString());
                                 }
                             }
-                            BarDataSet barDataSetP1 = new BarDataSet(entries,"1번빨래통");
-                            barDataSetP1.setColor(Color.RED);
-                            barDataSetP1.setValueTextColor(Color.RED);
-                            barDataSetP1.setValueTextSize(13f);
-
-
-
-                            barDataP.addDataSet(barDataSetP1);
-                            barDataP.setBarWidth(0.5f);
-
-
-
-
-                            periodChart1.animateY(500);
-                            periodChart1.setTouchEnabled(false);
-                            periodChart1.setMaxVisibleValueCount(5);
-                            periodChart1.setData(barDataP);
-
-                            XAxis xAxis = periodChart1.getXAxis();
-                            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); //x 축 표시에 대한 위치 설정
-                            xAxis.setValueFormatter(new ValueFormatter() {
-
-                                @Override
-                                public String getFormattedValue(float value) {
-                                    return labels[(int) value];
-                                }
-                            });
-                            YAxis yAxisLeft = periodChart1.getAxisLeft();
-                            yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); //Y축 텍스트 컬러 설정
-                            yAxisLeft.setGridColor(ContextCompat.getColor(getContext(), R.color.black)); // Y축 줄의 컬러 설정
-
-                            YAxis yAxisRight = periodChart1.getAxisRight(); //Y축의 오른쪽면 설정
-                            yAxisRight.setDrawLabels(false);
-                            yAxisRight.setDrawAxisLine(false);
-                            yAxisRight.setDrawGridLines(false);
-
-                            periodChart1.invalidate();
 
                         }
 
@@ -189,7 +160,7 @@ public class FeatureFragment extends Fragment {
                         Map map = document.getData();
 
                         if(map.size() != 0) {
-                            ArrayList<BarEntry> entries = new ArrayList<>();
+
                             TreeMap map1 = new TreeMap(map);
                             List<String> keyList = new ArrayList<>(map1.keySet());
                             for (int i = 0; i < 6 && i < keyList.size() - 1; i++) {
@@ -198,46 +169,14 @@ public class FeatureFragment extends Fragment {
                                     Date date2 = dateFormat.parse(keyList.get(keyList.size()-1-(i+1)));
                                     long day = (date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24);
 
-                                    entries.add(new BarEntry(i,day));
+                                    entriesP2.add(new BarEntry(i,day));
 
                                 }catch(Exception e){
 
                                     Log.d("FeatureFragment",e.toString());
                                 }
                             }
-                            BarDataSet barDataSetP2 = new BarDataSet(entries, "2번빨래통");
-                            barDataSetP2.setColor(Color.BLUE);
-                            barDataSetP2.setValueTextColor(Color.BLUE);
-                            barDataSetP2.setValueTextSize(13f);
 
-                            barDataP.addDataSet(barDataSetP2);
-
-                            barDataP.setBarWidth(0.25f);
-
-                            XAxis xAxis = periodChart1.getXAxis();
-                            xAxis.setGranularity(1f);
-                            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); //x 축 표시에 대한 위치 설정
-                            xAxis.setValueFormatter(new ValueFormatter() {
-
-                                @Override
-                                public String getFormattedValue(float value) {
-                                    return labels[(int) value];
-                                }
-                            });
-                            YAxis yAxisLeft = periodChart1.getAxisLeft();
-                            yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); //Y축 텍스트 컬러 설정
-                            yAxisLeft.setGridColor(ContextCompat.getColor(getContext(), R.color.black)); // Y축 줄의 컬러 설정
-
-                            YAxis yAxisRight = periodChart1.getAxisRight(); //Y축의 오른쪽면 설정
-                            yAxisRight.setDrawLabels(false);
-                            yAxisRight.setDrawAxisLine(false);
-                            yAxisRight.setDrawGridLines(false);
-
-                            periodChart1.animateY(500);
-                            periodChart1.setTouchEnabled(false);
-                            periodChart1.setMaxVisibleValueCount(5);
-                            periodChart1.setData(barDataP);
-                            periodChart1.invalidate();
 
 
                         }
@@ -258,47 +197,15 @@ public class FeatureFragment extends Fragment {
 
                         Map map = document.getData();
                         if(map.size() != 0) {
-                            ArrayList<BarEntry> entries = new ArrayList<>();
+
                             TreeMap map1 = new TreeMap(map);
                             List<String> keyList = new ArrayList<>(map1.keySet());
                             for (int i = 0; i < 7 && i < keyList.size() - 1; i++) {
                                 float weight = Float.valueOf(String.valueOf(map.get(keyList.get(keyList.size()-1-i))));
-                                entries.add(new BarEntry(i, weight));
+                                entriesW1.add(new BarEntry(i, weight));
                             }
-                            BarDataSet barDataSetW1 = new BarDataSet(entries, "1번빨래통");
-                            barDataSetW1.setColor(Color.RED);
-                            barDataSetW1.setValueTextColor(Color.RED);
-                            barDataSetW1.setValueTextSize(13f);
 
 
-                            barDataW.addDataSet(barDataSetW1);
-
-                            barDataW.setBarWidth(0.5f);
-
-                            XAxis xAxis = incChart1.getXAxis();
-                            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); //x 축 표시에 대한 위치 설정
-                            xAxis.setValueFormatter(new ValueFormatter() {
-
-                                @Override
-                                public String getFormattedValue(float value) {
-                                    return labels[(int) value];
-                                }
-                            });
-                            xAxis.setGranularity(1f);
-                            YAxis yAxisLeft = incChart1.getAxisLeft();
-                            yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); //Y축 텍스트 컬러 설정
-                            yAxisLeft.setGridColor(ContextCompat.getColor(getContext(), R.color.black)); // Y축 줄의 컬러 설정
-
-                            YAxis yAxisRight = incChart1.getAxisRight(); //Y축의 오른쪽면 설정
-                            yAxisRight.setDrawLabels(false);
-                            yAxisRight.setDrawAxisLine(false);
-                            yAxisRight.setDrawGridLines(false);
-
-                            incChart1.animateY(500);
-                            incChart1.setMaxVisibleValueCount(7);
-                            incChart1.setTouchEnabled(false);
-                            incChart1.setData(barDataW);
-                            incChart1.invalidate();
                         }
 
                     }
@@ -317,47 +224,14 @@ public class FeatureFragment extends Fragment {
                     if(task!=null){
                         Map map = document.getData();
                         if(map.size() != 0) {
-                            ArrayList<BarEntry> entries = new ArrayList<>();
+
                             TreeMap map1 = new TreeMap(map);
                             List<String> keyList = new ArrayList<>(map1.keySet());
                             for (int i = 0; i < 7 && i < keyList.size() - 1; i++) {
                                 float weight = Float.valueOf(String.valueOf(map.get(keyList.get(keyList.size()-1-i))));
-                                entries.add(new BarEntry(i, weight));
+                                entriesW2.add(new BarEntry(i, weight));
                             }
-                            BarDataSet barDataSetW1 = new BarDataSet(entries, "2번빨래통");
-                            barDataSetW1.setColor(Color.BLUE);
-                            barDataSetW1.setValueTextColor(Color.BLUE);
-                            barDataSetW1.setValueTextSize(13f);
 
-
-                            barDataW.addDataSet(barDataSetW1);
-
-                            barDataW.setBarWidth(0.5f);
-
-                            XAxis xAxis = incChart1.getXAxis();
-                            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); //x 축 표시에 대한 위치 설정
-                            xAxis.setValueFormatter(new ValueFormatter() {
-
-                                @Override
-                                public String getFormattedValue(float value) {
-                                    return labels[(int) value];
-                                }
-                            });
-                            xAxis.setGranularity(1f);
-                            YAxis yAxisLeft = incChart1.getAxisLeft();
-                            yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); //Y축 텍스트 컬러 설정
-                            yAxisLeft.setGridColor(ContextCompat.getColor(getContext(), R.color.black)); // Y축 줄의 컬러 설정
-
-                            YAxis yAxisRight = incChart1.getAxisRight(); //Y축의 오른쪽면 설정
-                            yAxisRight.setDrawLabels(false);
-                            yAxisRight.setDrawAxisLine(false);
-                            yAxisRight.setDrawGridLines(false);
-
-                            incChart1.animateY(500);
-                            incChart1.setMaxVisibleValueCount(7);
-                            incChart1.setTouchEnabled(false);
-                            incChart1.setData(barDataW);
-                            incChart1.invalidate();
 
                         }
                     }
@@ -367,9 +241,102 @@ public class FeatureFragment extends Fragment {
                 }
             });
 
-
-
         }
+
+        Handler mHandler = new Handler();
+        mHandler.postDelayed(new Runnable() {
+            public void run() {
+                BarDataSet barDataSetW1 = new BarDataSet(entriesW1, "1번빨래통");
+                barDataSetW1.setColor(Color.RED);
+                barDataSetW1.setValueTextColor(Color.RED);
+                barDataSetW1.setValueTextSize(13f);
+
+                BarDataSet barDataSetW2 = new BarDataSet(entriesW2, "2번빨래통");
+                barDataSetW2.setColor(Color.BLUE);
+                barDataSetW2.setValueTextColor(Color.BLUE);
+                barDataSetW2.setValueTextSize(13f);
+
+
+                BarDataSet barDataSetP1 = new BarDataSet(entriesP1, "1번빨래통");
+                barDataSetP1.setColor(Color.RED);
+                barDataSetP1.setValueTextColor(Color.RED);
+                barDataSetP1.setValueTextSize(13f);
+
+                BarDataSet barDataSetP2 = new BarDataSet(entriesP2, "2번빨래통");
+                barDataSetP2.setColor(Color.BLUE);
+                barDataSetP2.setValueTextColor(Color.BLUE);
+                barDataSetP2.setValueTextSize(13f);
+
+                barDataW.addDataSet(barDataSetW1);
+                barDataW.addDataSet(barDataSetW2);
+                barDataP.addDataSet(barDataSetP1);
+                barDataP.addDataSet(barDataSetP2);
+
+                barDataW.setBarWidth(0.5f);
+                barDataP.setBarWidth(0.5f);
+
+                XAxis xAxisW = incChart1.getXAxis();
+                xAxisW.setPosition(XAxis.XAxisPosition.BOTTOM); //x 축 표시에 대한 위치 설정
+                xAxisW.setValueFormatter(new ValueFormatter() {
+
+                    @Override
+                    public String getFormattedValue(float value) {
+                        return labels[(int) value];
+                    }
+                });
+
+
+                xAxisW.setGranularity(1f);
+                YAxis yAxisLeftW = incChart1.getAxisLeft();
+                yAxisLeftW.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); //Y축 텍스트 컬러 설정
+                yAxisLeftW.setGridColor(ContextCompat.getColor(getContext(), R.color.black)); // Y축 줄의 컬러 설정
+
+                YAxis yAxisRightW = incChart1.getAxisRight(); //Y축의 오른쪽면 설정
+                yAxisRightW.setDrawLabels(false);
+                yAxisRightW.setDrawAxisLine(false);
+                yAxisRightW.setDrawGridLines(false);
+
+                incChart1.animateY(500);
+                incChart1.setMaxVisibleValueCount(7);
+                incChart1.setTouchEnabled(false);
+                incChart1.setData(barDataW);
+                incChart1.invalidate();
+
+
+
+                XAxis xAxisP = periodChart1.getXAxis();
+                xAxisP.setGranularity(1f);
+                xAxisP.setPosition(XAxis.XAxisPosition.BOTTOM); //x 축 표시에 대한 위치 설정
+                xAxisP.setValueFormatter(new ValueFormatter() {
+
+                    @Override
+                    public String getFormattedValue(float value) {
+                        return labels[(int) value];
+                    }
+                });
+                YAxis yAxisLeftP = periodChart1.getAxisLeft();
+                yAxisLeftP.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); //Y축 텍스트 컬러 설정
+                yAxisLeftP.setGridColor(ContextCompat.getColor(getContext(), R.color.black)); // Y축 줄의 컬러 설정
+
+                YAxis yAxisRightP = periodChart1.getAxisRight(); //Y축의 오른쪽면 설정
+                yAxisRightP.setDrawLabels(false);
+                yAxisRightP.setDrawAxisLine(false);
+                yAxisRightP.setDrawGridLines(false);
+
+                periodChart1.animateY(500);
+                periodChart1.setTouchEnabled(false);
+                periodChart1.setMaxVisibleValueCount(5);
+                periodChart1.setData(barDataP);
+                periodChart1.invalidate();
+
+
+                }
+            }, 3000); // 3초후
+
+
+
+
+
 
 
         String averinc1 = String.format("%.2f",activity.userFeature.getAver_inc1());
